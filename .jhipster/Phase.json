@@ -1,0 +1,59 @@
+{
+  "applications": "*",
+  "changelogDate": "20230403210526",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "phase",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "objective",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "startDate",
+      "fieldType": "LocalDate"
+    },
+    {
+      "fieldName": "endDate",
+      "fieldType": "LocalDate"
+    },
+    {
+      "fieldName": "estimatedTime",
+      "fieldType": "Integer"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Phase",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "risk",
+      "otherEntityRelationshipName": "phase",
+      "relationshipName": "risk",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "sprint",
+      "otherEntityRelationshipName": "phase",
+      "relationshipName": "sprint",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "project",
+      "otherEntityRelationshipName": "phase",
+      "relationshipName": "project",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "serviceClass"
+}

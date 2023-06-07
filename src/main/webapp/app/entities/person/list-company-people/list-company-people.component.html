@@ -1,0 +1,185 @@
+<div class="card jh-card">
+  <div>
+    <h2 id="page-heading" data-cy="PersonHeading">
+      <span>People</span>
+
+      <div class="d-flex justify-content-end">
+        <button class="btn btn-info me-2" (click)="loadPeopleUser()" [disabled]="isLoading">
+          <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
+          <span>Refresh list</span>
+        </button>
+
+        <button
+          id="jh-create-entity"
+          data-cy="entityCreateButton"
+          class="btn btn-primary jh-create-entity create-person"
+          [routerLink]="['/account/register-employee', company?.id]"
+        >
+          <fa-icon icon="plus"></fa-icon>
+          <span> Register a new employee </span>
+        </button>
+      </div>
+    </h2>
+
+    <jhi-alert-error></jhi-alert-error>
+
+    <jhi-alert></jhi-alert>
+
+    <div class="alert alert-warning" id="no-result" *ngIf="peopleUser?.length === 0">
+      <span>No People found</span>
+    </div>
+
+    <div class="table-responsive table-entities" id="entities" *ngIf="peopleUser && peopleUser.length > 0">
+      <table class="table striped-table" aria-describedby="page-heading">
+        <thead style="background-color: #478bd9">
+          <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" (sortChange)="navigateToWithComponentValues()">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span>ID</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="code">
+              <div class="d-flex">
+                <span>Code</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="firstName">
+              <div class="d-flex">
+                <span>First name</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="lastName">
+              <div class="d-flex">
+                <span>Last name</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="phoneNumber">
+              <div class="d-flex">
+                <span>Phone Number</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <!--          <th scope="col" jhiSortBy="salary">-->
+            <!--            <div class="d-flex">-->
+            <!--              <span>Salary</span>-->
+            <!--              <fa-icon class="p-1" icon="sort"></fa-icon>-->
+            <!--            </div>-->
+            <!--          </th>-->
+            <th scope="col" jhiSortBy="status">
+              <div class="d-flex">
+                <span>Status</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="hireDate">
+              <div class="d-flex">
+                <span>Hire Date</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+
+            <th scope="col" jhiSortBy="city">
+              <div class="d-flex">
+                <span>City</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="manager.id">
+              <div class="d-flex">
+                <span>Manager</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="team.id">
+              <div class="d-flex">
+                <span>Team</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="department.id">
+              <div class="d-flex">
+                <span>Department</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="role.id">
+              <div class="d-flex">
+                <span>Role</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let person of peopleUser; trackBy: trackId" data-cy="entityTable">
+            <td>
+              <a [routerLink]="['/person', person.personDTO.id, 'view']">{{ person.personDTO.id }}</a>
+            </td>
+            <td>{{ person.personDTO.code }}</td>
+            <td>{{ person.adminUserDTO.firstName }}</td>
+            <td>{{ person.adminUserDTO.lastName }}</td>
+            <td>{{ person.personDTO.phoneNumber }}</td>
+            <td>{{ person.personDTO.status }}</td>
+            <td>{{ person.personDTO.hireDate }}</td>
+            <td>{{ person.personDTO.city }}</td>
+
+            <td>
+              <div *ngIf="person.personDTO.manager">
+                <a [routerLink]="['/person', person.personDTO.manager.id, 'view']">{{ person.personDTO.manager.id }}</a>
+              </div>
+            </td>
+            <td>
+              <span *ngFor="let team of person.personDTO.teams; let last = last">
+                <a class="form-control-static" [routerLink]="['/team', team.id, 'view']">{{ team.id }}</a
+                >{{ last ? '' : ', ' }}
+              </span>
+            </td>
+            <td>
+              <div *ngIf="person.personDTO.department">
+                <a [routerLink]="['/department', person.personDTO.department.id, 'view']">{{ person.personDTO.department.id }}</a>
+              </div>
+            </td>
+            <td>
+              <div *ngIf="person.personDTO.role">
+                <a [routerLink]="['/role', person.personDTO.role.id, 'view']">{{ person.personDTO.role.id }}</a>
+              </div>
+            </td>
+            <td class="text-end">
+              <div class="btn-group">
+                <button
+                  type="submit"
+                  [routerLink]="['/person', person.personDTO.id, 'view']"
+                  class="btn btn-info btn-sm"
+                  data-cy="entityDetailsButton"
+                >
+                  <fa-icon icon="eye"></fa-icon>
+                  <span class="d-none d-md-inline">View</span>
+                </button>
+
+                <button
+                  type="submit"
+                  [routerLink]="['/person', person.personDTO.id, 'edit']"
+                  class="btn btn-primary btn-sm"
+                  data-cy="entityEditButton"
+                >
+                  <fa-icon icon="pencil-alt"></fa-icon>
+                  <span class="d-none d-md-inline">Edit</span>
+                </button>
+
+                <button type="submit" (click)="deletePersonUser(person)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                  <fa-icon icon="times"></fa-icon>
+                  <span class="d-none d-md-inline">Delete</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

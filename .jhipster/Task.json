@@ -1,0 +1,84 @@
+{
+  "applications": "*",
+  "changelogDate": "20230403210529",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "task",
+  "fields": [
+    {
+      "fieldName": "title",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "TaskStatus",
+      "fieldValues": "TODO,IN_PROGRESS,CODE_REVIEW,READY_FOR_QA,DONE"
+    },
+    {
+      "fieldName": "startDate",
+      "fieldType": "LocalDate"
+    },
+    {
+      "fieldName": "estimatedTime",
+      "fieldType": "Float"
+    },
+    {
+      "fieldName": "timeLogged",
+      "fieldType": "Float"
+    },
+    {
+      "fieldName": "storyPoints",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "priority",
+      "fieldType": "TaskPriority",
+      "fieldValues": "LOWEST,LOW,MEDIUM,HIGH,HIGHEST"
+    },
+    {
+      "fieldName": "assignee",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "reporter",
+      "fieldType": "String"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Task",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "person",
+      "otherEntityRelationshipName": "task",
+      "relationshipName": "person",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "project",
+      "otherEntityRelationshipName": "task",
+      "relationshipName": "project",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "sprint",
+      "otherEntityRelationshipName": "task",
+      "relationshipName": "sprint",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "team",
+      "otherEntityRelationshipName": "task",
+      "relationshipName": "team",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "serviceClass"
+}

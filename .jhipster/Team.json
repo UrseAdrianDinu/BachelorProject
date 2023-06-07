@@ -1,0 +1,45 @@
+{
+  "applications": "*",
+  "changelogDate": "20230403210528",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "team",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "email",
+      "fieldType": "String"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Team",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "task",
+      "otherEntityRelationshipName": "team",
+      "relationshipName": "task",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "person",
+      "otherEntityRelationshipName": "team",
+      "ownerSide": false,
+      "relationshipName": "person",
+      "relationshipType": "many-to-many"
+    },
+    {
+      "otherEntityName": "project",
+      "otherEntityRelationshipName": "team",
+      "ownerSide": false,
+      "relationshipName": "project",
+      "relationshipType": "many-to-many"
+    }
+  ],
+  "service": "serviceClass"
+}

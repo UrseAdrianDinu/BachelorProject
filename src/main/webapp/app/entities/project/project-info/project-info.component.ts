@@ -1,0 +1,434 @@
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { IProject } from '../project.model';
+import { IPhase } from '../../phase/phase.model';
+import { ProjectService } from '../service/project.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { PhaseService } from '../../phase/service/phase.service';
+import { switchMap } from 'rxjs/operators';
+import { ITeam } from '../../team/team.model';
+import { TeamService } from '../../team/service/team.service';
+import { ISprint, NewSprint } from '../../sprint/sprint.model';
+import { IRisk, NewRisk } from '../../risk/risk.model';
+import { forkJoin } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { RiskService } from '../../risk/service/risk.service';
+import { ProbabilityValue } from '../../enumerations/probability-value.model';
+import { of } from 'rxjs';
+import { SprintService } from '../../sprint/service/sprint.service';
+import { PhaseStatus } from '../../enumerations/phase-status.model';
+import { IPerson } from '../../person/person.model';
+import { IPersonUser } from '../../person/list-company-people/person-user.model';
+import { PersonService } from '../../person/service/person.service';
+import { IPersonUserRole } from '../../person/list-company-people/person-user-role.model';
+import { ITask, NewTask } from '../../task/task.model';
+import { TaskService } from '../../task/service/task.service';
+
+@Component({
+  selector: 'jhi-project-info',
+  templateUrl: './project-info.component.html',
+  styleUrls: ['./project-info.component.scss'],
+})
+export class ProjectInfoComponent implements OnInit {
+  project: IProject | null = null;
+  togglePhases: boolean = false;
+  toggleTeams: boolean = false;
+  phases: IPhase[] = [];
+  teams: ITeam[] = [];
+  risks: IRisk[] | null = null;
+  sprints: ISprint[] | null = null;
+  activePhase: IPhase | undefined;
+  selectedPhase: string | undefined;
+  selectedProbability: string = '';
+  selectedStatus: string = '';
+  selectedDisplayPhase: IPhase | undefined;
+  displayObject: string = 'phase';
+  selectedDisplayTeam: ITeam | undefined;
+  teamPeople: IPersonUserRole[] = [];
+  selectedMember: string = '';
+  companyPeople: IPersonUser[] = [];
+  selectedDisplaySprint: ISprint | undefined;
+  sprintTasks: ITask[] = [];
+  selectedTaskPriority: string = '';
+  projectPeople: IPersonUser[] = [];
+  selectedPersonForTask: string = '';
+
+  createFormPhase = new FormGroup({
+    name: new FormControl('', {
+      validators: [Validators.required],
+    }),
+    objective: new FormControl('', {
+      validators: [Validators.required],
+    }),
+    description: new FormControl(''),
+    startDate: new FormControl(''),
+    estimatedTime: new FormControl(0),
+  });
+
+  createFormTeam = new FormGroup({
+    name: new FormControl('', {
+      validators: [Validators.required],
+    }),
+    email: new FormControl('', {
+      validators: [Validators.required],
+    }),
+  });
+
+  createFormRisk = new FormGroup({
+    description: new FormControl('', {
+      validators: [Validators.required],
+    }),
+    probability: new FormControl('', {
+      validators: [],
+    }),
+    impact: new FormControl('', {
+      validators: [],
+    }),
+  });
+
+  createFormSprint = new FormGroup({
+    number: new FormControl(0, {
+      validators: [Validators.required],
+    }),
+    goal: new FormControl('', {
+      validators: [],
+    }),
+    status: new FormControl(''),
+    startDate: new FormControl(''),
+    endDate: new FormControl(''),
+  });
+
+  addFormMember = new FormGroup({
+    member: new FormControl('', {
+      validators: [Validators.required],
+    }),
+  });
+
+  createFormTask = new FormGroup({
+    title: new FormControl('', {
+      nonNullable: false,
+      validators: [Validators.required],
+    }),
+    description: new FormControl('', {
+      validators: [],
+    }),
+    startDate: new FormControl(''),
+    estimatedTime: new FormControl('', {
+      validators: [Validators.required],
+    }),
+    storyPoints: new FormControl('', {
+      validators: [Validators.required],
+    }),
+    priority: new FormControl('', {
+      validators: [Validators.required],
+    }),
+    assignee: new FormControl('', {
+      validators: [Validators.required],
+    }),
+    reporter: new FormControl(''),
+  });
+
+  constructor(
+    protected activatedRoute: ActivatedRoute,
+    protected projectService: ProjectService,
+    protected phaseService: PhaseService,
+    protected teamService: TeamService,
+    protected riskService: RiskService,
+    protected sprintService: SprintService,
+    protected personService: PersonService,
+    protected taskService: TaskService,
+    private modalService: NgbModal
+  ) {}
+
+  selectedTab: string = 'sprints';
+
+  ngOnInit(): void {
+    this.activatedRoute.data
+      .pipe(
+        switchMap(({ project }) => {
+          this.project = project;
+          console.log(this.project?.endDate);
+          console.log(this.project?.name);
+          console.log(this.project?.company);
+
+          return forkJoin([this.projectService.getProjectPhases(this.project!.id), this.projectService.getProjectTeams(this.project!.id)]);
+        }),
+        switchMap(([phases, teams]) => {
+          this.phases = phases.body!;
+          console.log(this.phases);
+          this.activePhase = this.phases.find(phase => phase.status === 'ACTIVE');
+          console.log(this.activePhase);
+          this.teams = teams.body!;
+          console.log(teams.body);
+          this.selectedDisplayPhase = this.activePhase;
+          if (this.activePhase) {
+            return forkJoin([
+              this.phaseService.findPhaseRisks(this.activePhase.id),
+              this.phaseService.findPhaseSprints(this.activePhase.id),
+            ]).pipe(
+              map(([risks, sprints]) => ({
+                risks: risks.body!,
+                sprints: sprints.body!,
+              }))
+            );
+          } else {
+            return of({ risks: null, sprints: null });
+          }
+        })
+      )
+      .subscribe(({ risks, sprints }) => {
+        if (this.activePhase) {
+          this.risks = risks;
+          console.log(this.risks);
+          this.sprints = sprints;
+          console.log(this.sprints);
+        } else {
+          console.log('activePhase is null');
+        }
+      });
+  }
+
+  previousState(): void {
+    window.history.back();
+  }
+
+  openModalPhase(content: any): void {
+    this.modalService.open(content, { ariaLabelledBy: 'modal-title', backdrop: 'static' }).result.then(
+      result => {
+        if (result === 'save') {
+          // Handle form submission
+          if (this.createFormPhase.valid) {
+            // Form is valid, do something with the form data
+            console.log(this.createFormPhase.value);
+            this.phaseService
+              .createPhaseProject(this.createFormPhase.getRawValue(), this.project!.id)
+              .pipe(switchMap(() => this.projectService.getProjectPhases(this.project!.id)))
+              .subscribe(res => {
+                this.phases = res.body!;
+              });
+          }
+        }
+      },
+      reason => {
+        // Modal dismissed
+      }
+    );
+  }
+
+  openModalTeam(content: any): void {
+    this.modalService.open(content, { ariaLabelledBy: 'modal-title', backdrop: 'static' }).result.then(
+      result => {
+        if (result === 'save') {
+          // Handle form submission
+          if (this.createFormTeam.valid) {
+            // Form is valid, do something with the form data
+            console.log(this.createFormTeam.value);
+            this.teamService
+              .createTeamProject(this.createFormTeam.getRawValue(), this.project!.id)
+              .pipe(switchMap(() => this.projectService.getProjectTeams(this.project!.id)))
+              .subscribe(res => {
+                this.teams = res.body!;
+              });
+          }
+        }
+      },
+      reason => {
+        // Modal dismissed
+      }
+    );
+  }
+
+  selectChangeHandlerPhase($event: Event) {
+    const target = $event.target as HTMLSelectElement;
+    this.selectedPhase = target?.value;
+    console.log(this.selectedPhase);
+  }
+
+  setActivePhase() {
+    this.phaseService.setPhaseActive(parseInt(this.selectedPhase!, 10)).subscribe(res => {
+      this.activePhase = res.body!;
+      console.log(this.activePhase);
+    });
+  }
+
+  addRisk(content: any): void {
+    this.modalService.open(content, { ariaLabelledBy: 'modal-title', backdrop: 'static' }).result.then(
+      result => {
+        if (result === 'save') {
+          // Handle form submission
+          if (this.createFormRisk.valid) {
+            // Form is valid, do something with the form data
+            console.log(this.createFormRisk.value);
+            this.riskService
+              .createRiskPhase(this.createFormRisk.getRawValue() as NewRisk, this.selectedDisplayPhase!.id)
+              .pipe(switchMap(() => this.phaseService.findPhaseRisks(this.selectedDisplayPhase!.id)))
+              .subscribe(res => {
+                this.risks = res.body!;
+              });
+          }
+        }
+      },
+      reason => {
+        // Modal dismissed
+      }
+    );
+  }
+
+  addSprint(content: any): void {
+    this.modalService.open(content, { ariaLabelledBy: 'modal-title', backdrop: 'static' }).result.then(
+      result => {
+        if (result === 'save') {
+          // Handle form submission
+          if (this.createFormSprint.valid) {
+            // Form is valid, do something with the form data
+            console.log(this.createFormSprint.value);
+            this.sprintService
+              .createSprintPhase(this.createFormSprint.getRawValue() as NewSprint, this.selectedDisplayPhase!.id)
+              .pipe(switchMap(() => this.phaseService.findPhaseSprints(this.selectedDisplayPhase!.id)))
+              .subscribe(res => {
+                this.sprints = res.body!;
+              });
+          }
+        }
+      },
+      reason => {
+        // Modal dismissed
+      }
+    );
+  }
+
+  selectChangeHandlerProbability($event: Event) {
+    const target = $event.target as HTMLSelectElement;
+    this.selectedProbability = target?.value;
+    console.log(this.selectedProbability);
+  }
+
+  getProbabilityClass(probability: string | null | undefined): string {
+    if (probability === 'HIGH') {
+      return 'high-probability';
+    } else if (probability === 'MEDIUM') {
+      return 'medium-probability';
+    } else if (probability === 'LOW') {
+      return 'low-probability';
+    } else {
+      return '';
+    }
+  }
+
+  selectTab(tab: string) {
+    this.selectedTab = tab;
+  }
+
+  getStatusClass(status: string | null | undefined): string {
+    if (status === 'ACTIVE') {
+      return 'status-active';
+    } else if (status === 'CLOSED') {
+      return 'status-closed';
+    } else if (status === 'FUTURE') {
+      return 'status-future';
+    }
+    return '';
+  }
+
+  setSelectedPhase(phase: IPhase) {
+    this.selectedDisplayPhase = phase;
+    this.displayObject = 'phase';
+    this.phaseService.findPhaseRisks(phase.id).subscribe(res => {
+      this.risks = res.body!;
+      this.phaseService.findPhaseSprints(phase.id).subscribe(res => {
+        this.sprints = res.body!;
+      });
+    });
+  }
+
+  protected readonly PhaseStatus = PhaseStatus;
+
+  setSelectedTeam(team: ITeam) {
+    this.displayObject = 'team';
+    this.selectedDisplayTeam = team;
+    this.teamService.findTeamPeople(team.id).subscribe(res => {
+      this.teamPeople = res.body!;
+      console.log(this.teamPeople);
+    });
+  }
+
+  addMember(content: any) {
+    this.personService.queryPeopleUserByCompany(this.project!.company!.id).subscribe(res => {
+      this.companyPeople = res.body!;
+      console.log(this.companyPeople);
+      this.modalService.open(content, { ariaLabelledBy: 'modal-title', backdrop: 'static' }).result.then(
+        result => {
+          if (result === 'save') {
+            // Handle form submission
+            if (this.addFormMember.valid) {
+              // Form is valid, do something with the form data
+              console.log(this.addFormMember.value);
+              const personId = parseInt(this.addFormMember.get('member')!.value!);
+              this.personService
+                .addPersonTeam(personId, this.selectedDisplayTeam?.id!)
+                .pipe(switchMap(() => this.teamService.findTeamPeople(this.selectedDisplayTeam!.id)))
+                .subscribe(res => {
+                  this.teamPeople = res.body!;
+                });
+            }
+          }
+        },
+        reason => {
+          // Modal dismissed
+        }
+      );
+    });
+  }
+
+  selectChangeHandlerMember($event: Event) {
+    const target = $event.target as HTMLSelectElement;
+    this.selectedMember = target?.value;
+  }
+
+  setSelectedSprint(sprint: ISprint) {
+    this.selectedDisplaySprint = sprint;
+    this.displayObject = 'sprint';
+    console.log(this.selectedDisplaySprint.number);
+    this.sprintService.getSprintTasks(this.selectedDisplaySprint.id).subscribe(res => {
+      this.sprintTasks = res.body!;
+    });
+  }
+
+  addTask(content: any) {
+    this.projectService.getProjectPeopleUser(this.project!.id).subscribe(res => {
+      this.projectPeople = res.body!;
+      console.log(this.projectPeople);
+      this.modalService.open(content, { ariaLabelledBy: 'modal-title', backdrop: 'static' }).result.then(
+        result => {
+          if (result === 'save') {
+            // Handle form submission
+            if (this.createFormTask.valid) {
+              // Form is valid, do something with the form data
+              console.log(this.createFormTask.value);
+              const personId = parseInt(this.createFormTask.get('assignee')!.value!);
+              this.taskService
+                .createTask(this.createFormTask.getRawValue() as NewTask, this.project!.id, this.selectedDisplaySprint!.id, personId)
+                .pipe(switchMap(() => this.sprintService.getSprintTasks(this.selectedDisplaySprint!.id)))
+                .subscribe(res => {
+                  this.sprintTasks = res.body!;
+                });
+            }
+          }
+        },
+        reason => {
+          // Modal dismissed
+        }
+      );
+    });
+  }
+
+  backToCurrentPhase() {
+    this.displayObject = 'phase';
+  }
+
+  selectChangeHandlerPersonTask($event: Event) {
+    const target = $event.target as HTMLSelectElement;
+    this.selectedPersonForTask = target?.value;
+  }
+}

@@ -1,0 +1,654 @@
+<div style="height: calc(100vh - 61.38px); display: flex; flex-direction: row">
+  <div class="row" style="flex-grow: 1; flex: 15%; overflow-y: auto; background-color: #478bd9">
+    <div class="sidebar" style="padding-right: 0; padding-top: 30px; display: flex; flex-direction: column; overflow-y: auto">
+      <ul>
+        <li id="phases" (click)="togglePhases = !togglePhases">
+          <span class="sidebar-item" style="text-align: center; border-top: 1px solid #ddd">Phases</span>
+          <div *ngIf="togglePhases" class="expandable-section">
+            <ul style="background-color: #478bd9">
+              <li *ngIf="phases.length === 0">No phases created</li>
+              <li *ngFor="let phase of phases" (click)="setSelectedPhase(phase); $event.stopPropagation()">{{ phase.name }}</li>
+              <li id="addPhase" (click)="openModalPhase(addPhaseModal); $event.stopPropagation()">Add a new phase</li>
+            </ul>
+          </div>
+        </li>
+        <li id="teams" (click)="toggleTeams = !toggleTeams">
+          <span class="sidebar-item" style="text-align: center; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd">Teams</span>
+          <div *ngIf="toggleTeams" class="expandable-section">
+            <ul style="background-color: #478bd9">
+              <li *ngIf="teams.length === 0">No teams created</li>
+              <li *ngFor="let team of teams" (click)="setSelectedTeam(team); $event.stopPropagation()">{{ team.name }}</li>
+              <li id="addTeam" (click)="openModalTeam(addTeamModal); $event.stopPropagation()">Add a new team</li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+
+      <div style="display: flex; justify-content: center">
+        <button type="submit" (click)="previousState()" class="btn btn-primary" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Back</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="col" style="flex: 85%; flex-grow: 1; overflow-y: auto">
+    <div
+      class="justify-content-left jh-card card"
+      style="margin-left: 30px; margin-right: 15px; padding: 20px; border: 1px solid #ddd; background-color: #8ccfda"
+    >
+      <div class="col-8">
+        <div *ngIf="project">
+          <h2 data-cy="projectDetailsHeading" style="margin-bottom: 20px">
+            <span>Project {{ project!.name }} ({{ project!.code }})</span>
+          </h2>
+
+          <jhi-alert-error></jhi-alert-error>
+          <jhi-alert></jhi-alert>
+
+          <div *ngIf="project" class="row-md" style="font-size: 24px">
+            <div><strong>Domain:</strong> {{ project!.domain }}</div>
+            <div><strong>Description:</strong> {{ project!.description }}</div>
+            <div><strong>Status:</strong> {{ project!.status }}</div>
+            <div *ngIf="project?.endDate === undefined">
+              <strong>Duration:</strong>
+              {{ project!.startDate | formatMediumDate }} - present
+            </div>
+            <div *ngIf="project?.endDate !== undefined">
+              <strong>Duration:</strong>
+              {{ project!.startDate | formatMediumDate }} - {{ project!.endDate | formatMediumDate }}
+            </div>
+
+            <div><strong>Billable:</strong> {{ project!.billable }}</div>
+            <div *ngIf="project!.teams?.length === 0">No teams created for this project yet.</div>
+
+            <div *ngIf="activePhase === undefined">
+              <div class="column">
+                <div class="row" style="margin-top: 20px">
+                  <div>
+                    No active phase
+                    <div *ngIf="phases.length === 0">Define the project phases, then set an active one.</div>
+                  </div>
+                  <div class="row align-items-center" *ngIf="phases.length !== 0">
+                    <label class="form-label col-md-4">Set active phase</label>
+                    <select
+                      [(ngModel)]="selectedPhase"
+                      class="custom-select col-md-3"
+                      style="padding-left: 0"
+                      (change)="selectChangeHandlerPhase($event)"
+                    >
+                      <option [value]="" disabled [selected]="selectedPhase === ''">Set active phase</option>
+                      <option *ngFor="let phase of phases" [value]="phase.id">{{ phase.name }}</option>
+                    </select>
+                    <div class="row">
+                      <button
+                        style="margin-left: 12px; width: 300px"
+                        type="button"
+                        class="btn btn-primary col-md-3"
+                        (click)="setActivePhase()"
+                      >
+                        Set the selected phase as active
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--    <div class="row-8" style="margin-top: 20px; margin-left: 30px; margin-right: 15px; border: 1px solid #ddd;border-radius: 6px; background-color: #8ccfda; padding: 20px;">-->
+    <!--      <div style="display: flex; align-items: center; justify-content: space-between;">-->
+    <!--        <h3 *ngIf="activePhase !== undefined">-->
+    <!--          <span>{{ activePhase?.name }} is the active phase</span>-->
+    <!--        </h3>-->
+    <!--        <div>-->
+    <!--          <button (click)="addRisk(addRiskModal)" class="btn btn-primary">Add Risk</button>-->
+    <!--          <button (click)="addSprint(addSprintModal)" class="btn btn-primary">Add Sprint</button>-->
+    <!--        </div>-->
+    <!--      </div>-->
+
+    <!--      <div *ngIf="risks === null || risks?.length === 0" style="position: relative;">-->
+    <!--        No risks defined for this phase yet.-->
+    <!--      </div>-->
+
+    <!--      <ng-container *ngIf="risks?.length !== 0">-->
+    <!--        <h4>Risks</h4>-->
+    <!--        <div class="row">-->
+    <!--          <div *ngFor="let risk of risks" class="col-md-3">-->
+    <!--            <div class="card bg-light border-primary mb-3">-->
+    <!--              <div class="card-body">-->
+    <!--                <label style="font-weight: bold">Description:</label>-->
+    <!--                <div class="card-text">{{ risk.description }}</div>-->
+    <!--                <label style="font-weight: bold">Probability:</label>-->
+    <!--                <div class="card-text" [ngClass]="getProbabilityClass(risk.probability)">-->
+    <!--                  {{ risk.probability }}-->
+    <!--                </div>-->
+    <!--                <label style="font-weight: bold">Impact:</label>-->
+    <!--                <div class="card-text">{{ risk.impact }}</div>-->
+    <!--              </div>-->
+    <!--            </div>-->
+    <!--          </div>-->
+    <!--        </div>-->
+    <!--      </ng-container>-->
+
+    <!--      <div *ngIf="sprints === null || sprints?.length === 0" style="position: relative;">-->
+    <!--        No sprints defined for this phase yet.-->
+    <!--      </div>-->
+
+    <!--      <ng-container *ngIf="sprints?.length !== 0">-->
+    <!--        <h4>Sprints</h4>-->
+    <!--        <div class="row">-->
+    <!--          <div *ngFor="let sprint of sprints" class="col-md-3">-->
+    <!--            <div class="card bg-light border-primary mb-3">-->
+    <!--              <div class="card-body">-->
+    <!--                <label style="font-weight: bold">Description:</label>-->
+    <!--                <div class="card-text">{{ sprint.number }}</div>-->
+    <!--                <label style="font-weight: bold">Probability:</label>-->
+    <!--                <div class="card-text">-->
+    <!--                  {{ sprint.goal }}-->
+    <!--                </div>-->
+    <!--                <label style="font-weight: bold">Impact:</label>-->
+    <!--                <div class="card-text">{{ sprint.status }}</div>-->
+    <!--              </div>-->
+    <!--            </div>-->
+    <!--          </div>-->
+    <!--        </div>-->
+    <!--      </ng-container>-->
+    <!--    </div>-->
+
+    <div
+      *ngIf="displayObject == 'phase'"
+      class="row-8"
+      style="
+        margin-top: 20px;
+        margin-left: 30px;
+        margin-right: 15px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background-color: #8ccfda;
+        padding: 20px;
+      "
+    >
+      <div style="display: flex; align-items: center; justify-content: space-between">
+        <h3 *ngIf="selectedDisplayPhase !== undefined">
+          <span *ngIf="selectedDisplayPhase?.status === PhaseStatus.ACTIVE">{{ selectedDisplayPhase?.name }} is the active phase</span>
+          <span *ngIf="selectedDisplayPhase?.status !== PhaseStatus.ACTIVE">{{ selectedDisplayPhase?.name }}</span>
+        </h3>
+        <div>
+          <div class="button-bar">
+            <div [class.active]="selectedTab === 'sprints'" class="col" (click)="selectTab('sprints')">Sprints</div>
+            <div [class.active]="selectedTab === 'risks'" class="col" (click)="selectTab('risks')">Risks</div>
+          </div>
+          <div style="display: flex">
+            <button *ngIf="selectedTab === 'risks'" style="flex-grow: 1" (click)="addRisk(addRiskModal)" class="btn btn-primary">
+              Add Risk
+            </button>
+            <button *ngIf="selectedTab === 'sprints'" style="flex-grow: 1" (click)="addSprint(addSprintModal)" class="btn btn-primary">
+              Add Sprint
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <ng-container *ngIf="selectedTab === 'risks'">
+        <div *ngIf="risks === null || risks?.length === 0" style="position: relative">No risks defined for this phase yet.</div>
+
+        <ng-container *ngIf="risks?.length !== 0">
+          <h4>Risks</h4>
+          <div class="row">
+            <div *ngFor="let risk of risks" class="col-md-3">
+              <div class="card bg-light border-primary mb-3">
+                <div class="card-body">
+                  <label style="font-weight: bold">Description:</label>
+                  <div class="card-text">{{ risk.description }}</div>
+                  <label style="font-weight: bold">Probability:</label>
+                  <div class="card-text" [ngClass]="getProbabilityClass(risk.probability)">
+                    {{ risk.probability }}
+                  </div>
+                  <label style="font-weight: bold">Impact:</label>
+                  <div class="card-text">{{ risk.impact }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+
+      <ng-container *ngIf="selectedTab === 'sprints'">
+        <div *ngIf="sprints === null || sprints?.length === 0" style="position: relative">No sprints defined for this phase yet.</div>
+
+        <ng-container *ngIf="sprints?.length !== 0">
+          <h4>Sprints</h4>
+          <div class="row">
+            <div *ngFor="let sprint of sprints" style="cursor: pointer" class="col-md-3" (click)="setSelectedSprint(sprint)">
+              <div class="card bg-light border-primary mb-3">
+                <div class="card-body">
+                  <h5 class="card-title">Number: {{ sprint.number }}</h5>
+                  <label style="font-weight: bold">Status:</label>
+                  <div class="card-text" [ngClass]="getStatusClass(sprint.status)">
+                    {{ sprint.status }}
+                  </div>
+                  <label style="font-weight: bold">Goal:</label>
+                  <div class="card-text">{{ sprint.goal }}</div>
+                  <label style="font-weight: bold">Start date</label>
+                  <div class="card-text">{{ sprint.startDate }}</div>
+                  <label style="font-weight: bold">End date</label>
+                  <div class="card-text">{{ sprint.endDate }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+
+    <div
+      *ngIf="displayObject == 'team'"
+      class="row-8"
+      style="
+        margin-top: 20px;
+        margin-left: 30px;
+        margin-right: 15px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background-color: #8ccfda;
+        padding: 20px;
+      "
+    >
+      <div style="display: flex; align-items: center; justify-content: space-between">
+        <h3 *ngIf="selectedDisplayTeam !== undefined">
+          <span>Team {{ selectedDisplayTeam?.name }}</span>
+        </h3>
+        <div>
+          <div style="display: flex">
+            <button style="flex-grow: 1" (click)="addMember(addMemberModal)" class="btn btn-primary">Add member</button>
+          </div>
+        </div>
+      </div>
+      <ng-container>
+        <div *ngIf="teamPeople?.length === 0" style="position: relative">There are no people in this team.</div>
+        <ng-container *ngIf="teamPeople?.length !== 0">
+          <h4>Members</h4>
+          <div class="row">
+            <div *ngFor="let person of teamPeople" class="col-md-3">
+              <div class="card bg-light border-primary mb-3">
+                <div class="card-body">
+                  <h5 class="card-title">
+                    {{ person.adminUserDTO.firstName }} {{ person.adminUserDTO.lastName }} ({{ person.personDTO.code }})
+                  </h5>
+                  <label style="font-weight: bold">Email:</label>
+                  <div class="card-text">
+                    {{ person.adminUserDTO.email }}
+                  </div>
+                  <label style="font-weight: bold">Role:</label>
+                  <div class="card-text">
+                    {{ person.roleDTO.name }}
+                  </div>
+                  <label style="font-weight: bold">Seniority:</label>
+                  <div class="card-text">
+                    {{ person.roleDTO.seniority }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+
+    <div
+      *ngIf="displayObject == 'sprint'"
+      class="row-8"
+      style="
+        margin-top: 20px;
+        margin-left: 30px;
+        margin-right: 15px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background-color: #8ccfda;
+        padding: 20px;
+      "
+    >
+      <div style="display: flex; align-items: center; justify-content: space-between">
+        <h3 *ngIf="selectedDisplaySprint !== undefined">
+          <span>Sprint {{ selectedDisplaySprint?.number }}</span>
+        </h3>
+        <div>
+          <div style="display: flex; flex-direction: column">
+            <button style="margin-bottom: 5px" (click)="addTask(addTaskModal)" class="btn btn-primary row">Add task</button>
+            <button (click)="backToCurrentPhase()" class="btn btn-primary row">Back to current phase</button>
+          </div>
+        </div>
+      </div>
+
+      <ng-container>
+        <div *ngIf="sprintTasks?.length === 0" style="position: relative">There are no tasks in this sprint.</div>
+        <ng-container *ngIf="sprintTasks?.length !== 0">
+          <h4>Tasks</h4>
+          <div class="row">
+            <div *ngFor="let task of sprintTasks" class="col-md-3">
+              <div class="card bg-light border-primary mb-3">
+                <div class="card-body">
+                  <h5 class="card-title">{{ task.title }}</h5>
+                  <label style="font-weight: bold">Assignee:</label>
+                  <div class="card-text">
+                    {{ task.assignee }}
+                  </div>
+                  <label style="font-weight: bold">Description:</label>
+                  <div class="card-text">
+                    {{ task.description }}
+                  </div>
+                  <label style="font-weight: bold">Status:</label>
+                  <div class="card-text">
+                    {{ task.status }}
+                  </div>
+                  <label style="font-weight: bold">Start date:</label>
+                  <div class="card-text">
+                    {{ task.startDate }}
+                  </div>
+                  <label style="font-weight: bold">Estimated time:</label>
+                  <div class="card-text">
+                    {{ task.estimatedTime }}
+                  </div>
+                  <label style="font-weight: bold">Time logged:</label>
+                  <div *ngIf="!task.timeLogged" class="card-text">0 hours</div>
+                  <div *ngIf="task.timeLogged" class="card-text">{{ task.timeLogged }} hours</div>
+                  <label style="font-weight: bold">Story points:</label>
+                  <div class="card-text">
+                    {{ task.storyPoints }}
+                  </div>
+                  <label style="font-weight: bold">Priority:</label>
+                  <div class="card-text">
+                    {{ task.priority }}
+                  </div>
+                  <label style="font-weight: bold">Reporter:</label>
+                  <div class="card-text">
+                    {{ task.reporter }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<ng-template #addPhaseModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-title-phases">Add New Phase</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('cancel')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="createFormPhase">
+      <div class="form-group">
+        <label for="phaseName">Name</label>
+        <input type="text" class="form-control" id="phaseName" formControlName="name" />
+      </div>
+      <div class="form-group">
+        <label for="phaseObjective">Objective</label>
+        <input type="text" class="form-control" id="phaseObjective" formControlName="objective" />
+      </div>
+      <div class="form-group">
+        <label for="phaseDescription">Description</label>
+        <textarea class="form-control" id="phaseDescription" formControlName="description"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="phaseStartDate">Start Date</label>
+        <input type="date" class="form-control" id="phaseStartDate" formControlName="startDate" />
+      </div>
+      <div class="form-group">
+        <label for="phaseEstimatedTime">Estimated Time</label>
+        <input type="text" class="form-control" id="phaseEstimatedTime" formControlName="estimatedTime" />
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss('cancel')">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="modal.close('save')" [disabled]="!createFormPhase.valid">Save</button>
+  </div>
+</ng-template>
+
+<ng-template #addTeamModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-title-teams">Add New Team</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('cancel')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="createFormTeam">
+      <div class="form-group">
+        <label for="teamName">Name</label>
+        <input type="text" class="form-control" id="teamName" formControlName="name" />
+      </div>
+      <div class="form-group">
+        <label for="teamEmail">Email</label>
+        <input type="text" class="form-control" id="teamEmail" formControlName="email" />
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss('cancel')">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="modal.close('save')" [disabled]="!createFormTeam.valid">Save</button>
+  </div>
+</ng-template>
+
+<ng-template #addRiskModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-title-risks">Add New Risk to current phase</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('cancel')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="createFormRisk">
+      <div class="form-group">
+        <label for="riskDescription">Description</label>
+        <textarea class="form-control" id="riskDescription" formControlName="description"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="riskProbability">Probability</label>
+        <select
+          [(ngModel)]="selectedProbability"
+          class="custom-select row"
+          (change)="selectChangeHandlerProbability($event)"
+          style="width: 300px; height: 40px; margin-left: 1px"
+          formControlName="probability"
+          id="riskProbability"
+          name="riskProbability"
+        >
+          <option [value]="" disabled [selected]="selectedProbability === ''">Choose probability</option>
+          <option value="LOW">LOW</option>
+          <option value="MEDIUM">MEDIUM</option>
+          <option value="HIGH">HIGH</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="riskImpact">Impact</label>
+        <input type="text" class="form-control" id="riskImpact" formControlName="impact" />
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss('cancel')">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="modal.close('save')" [disabled]="!createFormRisk.valid">Save</button>
+  </div>
+</ng-template>
+
+<ng-template #addSprintModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-title-sprints">Add New Sprint to current phase</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('cancel')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="createFormSprint">
+      <div class="form-group">
+        <label for="sprintNumber">Number</label>
+        <input type="number" class="form-control" id="sprintNumber" formControlName="number" />
+      </div>
+      <div class="form-group">
+        <label for="sprintGoal">Goal</label>
+        <input type="text" class="form-control" id="sprintGoal" formControlName="goal" />
+      </div>
+      <div class="form-group">
+        <label for="sprintStatus">Probability</label>
+        <select
+          [(ngModel)]="selectedStatus"
+          class="custom-select row"
+          (change)="selectChangeHandlerProbability($event)"
+          style="width: 300px; height: 40px; margin-left: 1px"
+          formControlName="status"
+          id="sprintStatus"
+          name="sprintStatus"
+        >
+          <option [value]="" disabled [selected]="selectedStatus === ''">Choose status</option>
+          <option value="ACTIVE">ACTIVE</option>
+          <option value="FUTURE">FUTURE</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="sprintStartDate">Start Date</label>
+        <input type="date" class="form-control" id="sprintStartDate" formControlName="startDate" />
+      </div>
+      <div class="form-group">
+        <label for="sprintEndDate">End Date</label>
+        <input type="date" class="form-control" id="sprintEndDate" formControlName="endDate" />
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss('cancel')">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="modal.close('save')" [disabled]="!createFormSprint.valid">Save</button>
+  </div>
+</ng-template>
+
+<ng-template #addMemberModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-title-members">Add new member to current team</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('cancel')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="addFormMember">
+      <div class="form-group">
+        <label class="form-label">Add member</label>
+        <select
+          [(ngModel)]="selectedMember"
+          class="custom-select row"
+          (change)="selectChangeHandlerMember($event)"
+          style="width: 300px; height: 40px; margin-left: 1px"
+          formControlName="member"
+          id="member"
+          name="member"
+        >
+          <option [value]="" disabled [selected]="selectedMember === ''">Select member</option>
+          <option *ngFor="let person of companyPeople" [value]="person.personDTO.id">
+            {{ person.adminUserDTO.firstName }} {{ person.adminUserDTO.lastName }}
+          </option>
+        </select>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss('cancel')">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="modal.close('save')" [disabled]="!addFormMember.valid">Save</button>
+  </div>
+</ng-template>
+
+<ng-template #addTaskModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-title-tasks">Add new task</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('cancel')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="createFormTask">
+      <div class="form-group">
+        <label for="taskTitle">Title</label>
+        <input type="text" class="form-control" id="taskTitle" formControlName="title" />
+      </div>
+      <div class="form-group">
+        <label for="taskDescription">Description</label>
+        <textarea class="form-control" id="taskDescription" formControlName="description"> </textarea>
+      </div>
+      <!--      <div class="form-group">-->
+      <!--        <label for="sprintStatus">Probability</label>-->
+      <!--        <select [(ngModel)]="selectedStatus" class="custom-select row" (change)="selectChangeHandlerProbability($event)"-->
+      <!--                style="width: 300px; height: 40px; margin-left:1px" formControlName="status"-->
+      <!--                id="sprintStatus" name="sprintStatus">-->
+      <!--          <option [value]="" disabled [selected]="selectedStatus === ''">Choose status</option>-->
+      <!--          <option value="ACTIVE">ACTIVE</option>-->
+      <!--          <option value="FUTURE">FUTURE</option>-->
+      <!--        </select>-->
+      <!--      </div>-->
+      <div class="form-group">
+        <label for="taskStartDate">Start Date</label>
+        <input type="date" class="form-control" id="taskStartDate" formControlName="startDate" />
+      </div>
+      <div class="form-group">
+        <label for="taskEstimatedTime">Estimated time(hours)</label>
+        <input type="number" class="form-control" id="taskEstimatedTime" formControlName="estimatedTime" />
+      </div>
+      <div class="form-group">
+        <label for="taskStoryPoints">Story points</label>
+        <input type="number" class="form-control" id="taskStoryPoints" formControlName="storyPoints" />
+      </div>
+      <div class="form-group">
+        <label for="taskPrioity">End Date</label>
+        <select
+          [(ngModel)]="selectedTaskPriority"
+          class="custom-select row"
+          (change)="selectChangeHandlerProbability($event)"
+          style="width: 300px; height: 40px; margin-left: 1px"
+          formControlName="priority"
+          id="taskPrioity"
+          name="taskPrioity"
+        >
+          <option [value]="" disabled [selected]="selectedTaskPriority === ''">Choose priority</option>
+          <option value="LOWEST">LOWEST</option>
+          <option value="LOW">LOW</option>
+          <option value="MEDIUM">MEDIUM</option>
+          <option value="HIGH">HIGH</option>
+          <option value="HIGHEST">HIGHEST</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Assignee</label>
+        <select
+          [(ngModel)]="selectedMember"
+          class="custom-select row"
+          (change)="selectChangeHandlerPersonTask($event)"
+          style="width: 300px; height: 40px; margin-left: 1px"
+          formControlName="assignee"
+          id="taskAsignee"
+          name="taskAsignee"
+        >
+          <option [value]="" disabled [selected]="selectedMember === ''">Select member</option>
+          <option *ngFor="let person of projectPeople" [value]="person.personDTO.id">
+            {{ person.adminUserDTO.firstName }} {{ person.adminUserDTO.lastName }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="taskReporter">Reporter</label>
+        <input type="text" class="form-control" id="taskReporter" formControlName="reporter" />
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss('cancel')">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="modal.close('save')" [disabled]="!createFormTask.valid">Save</button>
+  </div>
+</ng-template>

@@ -1,0 +1,159 @@
+
+entity Person {
+    code String,
+	phoneNumber String,
+	salary Long,
+    status PersonStatus,
+    hireDate LocalDate,
+    dateOfBirth LocalDate
+    streetAddress String,
+	postalCode String,
+	city String,
+	region String,
+    country String,
+}
+
+entity Company {
+	name String required,
+    crn String required,
+    description String,
+    email String,
+    streetAdress String,
+    city String,
+    country String,
+    ceoName String
+}
+
+enum PersonStatus {
+	ACTIVE, SIGNED, INACTIVE, RESIGNED, SUSPENDED
+}
+
+
+entity Project {
+	name String required,
+    code String required,
+    domain String,
+    description String,
+    status ProjectStatus,
+    startDate LocalDate,
+    endDate LocalDate,
+    billable Boolean,
+}
+
+
+enum ProjectStatus {
+	ACTIVE, INACTIVE, SIGNING
+}
+
+entity Phase {
+	name String,
+    objective String,
+    description String
+    startDate LocalDate,
+    endDate LocalDate,
+    estimatedTime Integer,
+}
+
+entity Risk {
+	description String,
+    probability ProbabilityValue,
+    impact String,
+}
+
+enum ProbabilityValue {
+	LOW, MEDIUM, HIGH
+}
+
+entity Team {
+	name String,
+    email String
+}
+
+entity Task {
+	title String required,
+	description String,
+    status TaskStatus,
+    startDate LocalDate,
+    estimatedTime Float,
+    timeLogged Float,
+    storyPoints Integer,
+    priority TaskPriority,
+    assignee String,
+    reporter String,
+}
+
+enum TaskStatus {
+	TODO, IN_PROGRESS, CODE_REVIEW, READY_FOR_QA, DONE
+}
+
+enum TaskPriority {
+	LOWEST, LOW, MEDIUM, HIGH, HIGHEST
+}
+
+entity Sprint {
+	number Integer,
+    status SprintStatus,
+    goal String,
+    startDate LocalDate,
+    endDate LocalDate
+}
+
+enum SprintStatus {
+	FUTURE, ACTIVE, CLOSED
+}
+
+
+entity Department {
+	name String required,
+    code String required,
+    email String,
+    description String,
+}
+
+
+
+entity Role {
+	name String required,
+    code String required,
+    seniority RoleSeniority
+}
+
+enum RoleSeniority {
+	TRAINEE, JUNIOR, MID, SENIOR
+}
+
+
+
+
+// defining multiple OneToMany relationships with comments
+relationship OneToMany {
+	Company to Department{company},
+    Company to Project{company},
+	Department to Person{department},
+    Role to Person{role},
+    Person to Task{person},
+    Project to Task{project},
+    Project to Phase{project},
+    Sprint to Task{sprint},
+    Team to Task{team},
+    Phase to Risk{phase},
+    Phase to Sprint{phase},
+}
+
+relationship ManyToOne {
+	Person{manager} to Person,
+    Department{parentDept} to Department
+}
+
+relationship ManyToMany {
+	Person to Team,
+    Project to Team,
+}
+
+relationship OneToOne {
+	Person{user} to User
+}
+
+
+dto all with mapstruct
+

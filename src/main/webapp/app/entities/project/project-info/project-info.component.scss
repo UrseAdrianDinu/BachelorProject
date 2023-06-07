@@ -1,0 +1,121 @@
+.sidebar {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #478bd9;
+}
+
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.sidebar li {
+  cursor: pointer;
+}
+
+.sidebar li div {
+  display: block;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #333;
+  border-top: 1px solid #ddd; /* Add border to top */
+}
+
+.sidebar a {
+  text-decoration: none;
+  color: #333;
+}
+
+.sidebar li:hover {
+  background-color: rgb(185, 214, 229);
+}
+
+.expandable-section {
+  background-color: #478bd9;
+  border-top: 1px solid #ddd;
+}
+
+.expandable-section ul {
+  list-style-type: none;
+  padding-left: 20px;
+}
+
+.expandable-section ul li {
+  padding: 5px 0;
+}
+
+.expandable-section ul li:before {
+  content: '\2022';
+  color: #ffffff;
+  display: inline-block;
+  width: 1em;
+  margin-left: -1em;
+}
+
+.sidebar-item {
+  display: block;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #333;
+  transition: background-color 0.3s;
+}
+
+.sidebar li#addPhase::before {
+  content: '>>';
+  display: inline-block;
+  color: #ffffff;
+  width: 1em;
+  margin-left: -1em;
+}
+
+.sidebar li#addTeam:before {
+  content: '>>';
+  display: inline-block;
+  color: #ffffff;
+  width: 1em;
+  margin-left: -1em;
+}
+
+.high-probability {
+  color: red;
+}
+
+.medium-probability {
+  color: orange;
+}
+
+.low-probability {
+  color: green;
+}
+
+.button-bar {
+  display: flex;
+  border: 1px solid #000000;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.button-bar div {
+  padding: 10px;
+  cursor: pointer;
+  background-color: #ddd;
+}
+
+.button-bar div.active {
+  background-color: #66bb57;
+}
+
+.status-active {
+  color: green;
+}
+
+.status-closed {
+  color: red;
+}
+
+.status-future {
+  color: orange;
+}

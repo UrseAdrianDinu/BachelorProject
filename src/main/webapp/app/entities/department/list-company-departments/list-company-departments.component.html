@@ -1,0 +1,138 @@
+<div class="card jh-card">
+  <div>
+    <h2 id="page-heading" data-cy="DepartmentHeading">
+      <span>Departments of {{ company?.name }}</span>
+
+      <div class="d-flex justify-content-end">
+        <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+          <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
+          <span>Refresh list</span>
+        </button>
+
+        <button
+          id="jh-create-entity"
+          data-cy="entityCreateButton"
+          class="btn btn-primary jh-create-entity create-department"
+          [routerLink]="['/department/create', company?.id]"
+        >
+          <fa-icon icon="plus"></fa-icon>
+          <span> Create a new Department </span>
+        </button>
+      </div>
+    </h2>
+
+    <jhi-alert-error></jhi-alert-error>
+
+    <jhi-alert></jhi-alert>
+
+    <div class="alert alert-warning" id="no-result" *ngIf="departments?.length === 0">
+      <span>No Departments found</span>
+    </div>
+
+    <div class="table-responsive table-striped table-entities table-wrapper" id="entities" *ngIf="departments && departments.length > 0">
+      <table class="table striped-table" aria-describedby="page-heading">
+        <thead style="background-color: #478bd9">
+          <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" (sortChange)="navigateToWithComponentValues()">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span>ID</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="name">
+              <div class="d-flex">
+                <span>Name</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="code">
+              <div class="d-flex">
+                <span>Code</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="email">
+              <div class="d-flex">
+                <span>Email</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="description">
+              <div class="d-flex">
+                <span>Description</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="parentDept.id">
+              <div class="d-flex">
+                <span>Parent Dept</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="company.id">
+              <div class="d-flex">
+                <span>Company</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let department of departments; trackBy: trackId"
+            data-cy="entityTable"
+            class="clickable-row"
+            (click)="redirectToDepartment(department.id)"
+          >
+            <td>
+              <a [routerLink]="['/department', department.id, 'view']">{{ department.id }}</a>
+            </td>
+            <td>{{ department.name }}</td>
+            <td>{{ department.code }}</td>
+            <td>{{ department.email }}</td>
+            <td>{{ department.description }}</td>
+            <td>
+              <div *ngIf="department.parentDept">
+                <a [routerLink]="['/department', department.parentDept.id, 'view']">{{ department.parentDept.id }}</a>
+              </div>
+            </td>
+            <td>
+              <div *ngIf="department.company">
+                <a [routerLink]="['/company', department.company.id, 'view']">{{ department.company.id }}</a>
+              </div>
+            </td>
+            <td class="text-end">
+              <div class="btn-group">
+                <button
+                  type="submit"
+                  [routerLink]="['/department', department.id, 'view']"
+                  class="btn btn-info btn-sm"
+                  data-cy="entityDetailsButton"
+                >
+                  <fa-icon icon="eye"></fa-icon>
+                  <span class="d-none d-md-inline">View</span>
+                </button>
+
+                <button
+                  type="submit"
+                  [routerLink]="['/department', department.id, 'edit']"
+                  class="btn btn-primary btn-sm"
+                  data-cy="entityEditButton"
+                >
+                  <fa-icon icon="pencil-alt"></fa-icon>
+                  <span class="d-none d-md-inline">Edit</span>
+                </button>
+
+                <button type="submit" (click)="delete(department)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                  <fa-icon icon="times"></fa-icon>
+                  <span class="d-none d-md-inline">Delete</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

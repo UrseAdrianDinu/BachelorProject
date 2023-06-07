@@ -1,0 +1,38 @@
+{
+  "applications": "*",
+  "changelogDate": "20230403210532",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "role",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "code",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "seniority",
+      "fieldType": "RoleSeniority",
+      "fieldValues": "TRAINEE,JUNIOR,MID,SENIOR"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Role",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "person",
+      "otherEntityRelationshipName": "role",
+      "relationshipName": "person",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "service": "serviceClass"
+}

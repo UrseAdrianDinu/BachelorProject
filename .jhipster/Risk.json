@@ -1,0 +1,36 @@
+{
+  "applications": "*",
+  "changelogDate": "20230403210527",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "risk",
+  "fields": [
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "probability",
+      "fieldType": "ProbabilityValue",
+      "fieldValues": "LOW,MEDIUM,HIGH"
+    },
+    {
+      "fieldName": "impact",
+      "fieldType": "String"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Risk",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "phase",
+      "otherEntityRelationshipName": "risk",
+      "relationshipName": "phase",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "serviceClass"
+}

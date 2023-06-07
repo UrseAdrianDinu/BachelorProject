@@ -1,0 +1,77 @@
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+
+import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
+import { DepartmentComponent } from '../list/department.component';
+import { DepartmentDetailComponent } from '../detail/department-detail.component';
+import { DepartmentUpdateComponent } from '../update/department-update.component';
+import { DepartmentRoutingResolveService } from './department-routing-resolve.service';
+import { ASC } from 'app/config/navigation.constants';
+import { ListCompanyDepartmentsComponent } from '../list-company-departments/list-company-departments.component';
+import { CreateDepartmentComponent } from '../create-department/create-department.component';
+
+const departmentRoute: Routes = [
+  {
+    path: '',
+    component: DepartmentComponent,
+    data: {
+      defaultSort: 'id,' + ASC,
+    },
+    canActivate: [UserRouteAccessService],
+  },
+  {
+    path: ':id/view',
+    component: DepartmentDetailComponent,
+    resolve: {
+      department: DepartmentRoutingResolveService,
+    },
+    canActivate: [UserRouteAccessService],
+  },
+  {
+    path: 'new',
+    component: DepartmentUpdateComponent,
+    resolve: {
+      department: DepartmentRoutingResolveService,
+    },
+    canActivate: [UserRouteAccessService],
+  },
+  {
+    path: ':id/edit',
+    component: DepartmentUpdateComponent,
+    resolve: {
+      department: DepartmentRoutingResolveService,
+    },
+    canActivate: [UserRouteAccessService],
+  },
+  {
+    path: 'company',
+    component: ListCompanyDepartmentsComponent,
+    data: {
+      defaultSort: 'id,' + ASC,
+    },
+    canActivate: [UserRouteAccessService],
+  },
+
+  {
+    path: ':id/edit',
+    component: DepartmentUpdateComponent,
+    resolve: {
+      department: DepartmentRoutingResolveService,
+    },
+    canActivate: [UserRouteAccessService],
+  },
+  {
+    path: 'create/:id',
+    component: CreateDepartmentComponent,
+    // resolve: {
+    //   department: DepartmentRoutingResolveService,
+    // },
+    canActivate: [UserRouteAccessService],
+  },
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(departmentRoute)],
+  exports: [RouterModule],
+})
+export class DepartmentRoutingModule {}

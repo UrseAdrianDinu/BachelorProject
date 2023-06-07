@@ -1,0 +1,65 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-risk-heading" data-cy="RiskCreateUpdateHeading">Create or edit a Risk</h2>
+
+      <div>
+        <jhi-alert-error></jhi-alert-error>
+
+        <div class="row mb-3" *ngIf="editForm.controls.id.value !== null">
+          <label class="form-label" for="field_id">ID</label>
+          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" for="field_description">Description</label>
+          <input
+            type="text"
+            class="form-control"
+            name="description"
+            id="field_description"
+            data-cy="description"
+            formControlName="description"
+          />
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" for="field_probability">Probability</label>
+          <select class="form-control" name="probability" formControlName="probability" id="field_probability" data-cy="probability">
+            <option [ngValue]="null"></option>
+            <option *ngFor="let probabilityValue of probabilityValueValues" [value]="probabilityValue">probabilityValue</option>
+          </select>
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" for="field_impact">Impact</label>
+          <input type="text" class="form-control" name="impact" id="field_impact" data-cy="impact" formControlName="impact" />
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" for="field_phase">Phase</label>
+          <select class="form-control" id="field_phase" data-cy="phase" name="phase" formControlName="phase" [compareWith]="comparePhase">
+            <option [ngValue]="null"></option>
+            <option [ngValue]="phaseOption" *ngFor="let phaseOption of phasesSharedCollection">{{ phaseOption.id }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span>Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

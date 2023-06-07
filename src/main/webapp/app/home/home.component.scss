@@ -1,0 +1,52 @@
+/* ==========================================================================
+Main page styles
+========================================================================== */
+
+.hipster {
+  display: inline-block;
+  width: 347px;
+  height: 497px;
+  background: url('../../content/images/jhipster_family_member_0.svg') no-repeat center top;
+  background-size: contain;
+}
+
+/* wait autoprefixer update to allow simple generation of high pixel density media query */
+@media only screen and (-webkit-min-device-pixel-ratio: 2),
+  only screen and (-moz-min-device-pixel-ratio: 2),
+  only screen and (-o-min-device-pixel-ratio: 2/1),
+  only screen and (min-resolution: 192dpi),
+  only screen and (min-resolution: 2dppx) {
+  .hipster {
+    background: url('../../content/images/jhipster_family_member_0.svg') no-repeat center top;
+    background-size: contain;
+  }
+}
+
+.container-home {
+  display: flex;
+  flex-direction: row;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
+  width: 100%;
+  left: 0;
+  position: absolute;
+  top: 65px;
+  bottom: 0;
+}
+
+.left-half {
+  flex-basis: 41%;
+  height: 100%;
+}
+
+.right-half {
+  flex-basis: 59%;
+  height: 100%;
+}
+
+.home-img {
+  background: url('../../content/images/home1.jpeg') no-repeat center center;
+  background-size: cover; /* set the background-size property to cover */
+  height: 100%;
+}

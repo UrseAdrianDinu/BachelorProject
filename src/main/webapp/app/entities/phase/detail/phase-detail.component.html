@@ -1,0 +1,58 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <div *ngIf="phase">
+      <h2 data-cy="phaseDetailsHeading"><span>Phase</span></h2>
+
+      <hr />
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <dl class="row-md jh-entity-details">
+        <dt><span>ID</span></dt>
+        <dd>
+          <span>{{ phase.id }}</span>
+        </dd>
+        <dt><span>Name</span></dt>
+        <dd>
+          <span>{{ phase.name }}</span>
+        </dd>
+        <dt><span>Objective</span></dt>
+        <dd>
+          <span>{{ phase.objective }}</span>
+        </dd>
+        <dt><span>Description</span></dt>
+        <dd>
+          <span>{{ phase.description }}</span>
+        </dd>
+        <dt><span>Start Date</span></dt>
+        <dd>
+          <span>{{ phase.startDate | formatMediumDate }}</span>
+        </dd>
+        <dt><span>End Date</span></dt>
+        <dd>
+          <span>{{ phase.endDate | formatMediumDate }}</span>
+        </dd>
+        <dt><span>Estimated Time</span></dt>
+        <dd>
+          <span>{{ phase.estimatedTime }}</span>
+        </dd>
+        <dt><span>Project</span></dt>
+        <dd>
+          <div *ngIf="phase.project">
+            <a [routerLink]="['/project', phase.project.id, 'view']">{{ phase.project.id }}</a>
+          </div>
+        </dd>
+      </dl>
+
+      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Back</span>
+      </button>
+
+      <button type="button" [routerLink]="['/phase', phase.id, 'edit']" class="btn btn-primary">
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span>Edit</span>
+      </button>
+    </div>
+  </div>
+</div>

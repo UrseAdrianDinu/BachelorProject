@@ -1,0 +1,50 @@
+{
+  "applications": "*",
+  "changelogDate": "20230403210530",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "sprint",
+  "fields": [
+    {
+      "fieldName": "number",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "SprintStatus",
+      "fieldValues": "FUTURE,ACTIVE,CLOSED"
+    },
+    {
+      "fieldName": "goal",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "startDate",
+      "fieldType": "LocalDate"
+    },
+    {
+      "fieldName": "endDate",
+      "fieldType": "LocalDate"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Sprint",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "task",
+      "otherEntityRelationshipName": "sprint",
+      "relationshipName": "task",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "phase",
+      "otherEntityRelationshipName": "sprint",
+      "relationshipName": "phase",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "serviceClass"
+}

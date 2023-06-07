@@ -1,0 +1,46 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <div *ngIf="risk">
+      <h2 data-cy="riskDetailsHeading"><span>Risk</span></h2>
+
+      <hr />
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <dl class="row-md jh-entity-details">
+        <dt><span>ID</span></dt>
+        <dd>
+          <span>{{ risk.id }}</span>
+        </dd>
+        <dt><span>Description</span></dt>
+        <dd>
+          <span>{{ risk.description }}</span>
+        </dd>
+        <dt><span>Probability</span></dt>
+        <dd>
+          <span>{{ risk.probability }}</span>
+        </dd>
+        <dt><span>Impact</span></dt>
+        <dd>
+          <span>{{ risk.impact }}</span>
+        </dd>
+        <dt><span>Phase</span></dt>
+        <dd>
+          <div *ngIf="risk.phase">
+            <a [routerLink]="['/phase', risk.phase.id, 'view']">{{ risk.phase.id }}</a>
+          </div>
+        </dd>
+      </dl>
+
+      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Back</span>
+      </button>
+
+      <button type="button" [routerLink]="['/risk', risk.id, 'edit']" class="btn btn-primary">
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span>Edit</span>
+      </button>
+    </div>
+  </div>
+</div>

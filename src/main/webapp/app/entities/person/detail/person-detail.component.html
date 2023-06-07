@@ -1,0 +1,101 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <div *ngIf="person">
+      <h2 data-cy="personDetailsHeading"><span>Person</span></h2>
+
+      <hr />
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <dl class="row-md jh-entity-details">
+        <dt><span>ID</span></dt>
+        <dd>
+          <span>{{ person.id }}</span>
+        </dd>
+        <dt><span>Code</span></dt>
+        <dd>
+          <span>{{ person.code }}</span>
+        </dd>
+        <dt><span>Phone Number</span></dt>
+        <dd>
+          <span>{{ person.phoneNumber }}</span>
+        </dd>
+        <dt><span>Salary</span></dt>
+        <dd>
+          <span>{{ person.salary }}</span>
+        </dd>
+        <dt><span>Status</span></dt>
+        <dd>
+          <span>{{ person.status }}</span>
+        </dd>
+        <dt><span>Hire Date</span></dt>
+        <dd>
+          <span>{{ person.hireDate | formatMediumDate }}</span>
+        </dd>
+        <dt><span>Date Of Birth</span></dt>
+        <dd>
+          <span>{{ person.dateOfBirth | formatMediumDate }}</span>
+        </dd>
+        <dt><span>Street Address</span></dt>
+        <dd>
+          <span>{{ person.streetAddress }}</span>
+        </dd>
+        <dt><span>Postal Code</span></dt>
+        <dd>
+          <span>{{ person.postalCode }}</span>
+        </dd>
+        <dt><span>City</span></dt>
+        <dd>
+          <span>{{ person.city }}</span>
+        </dd>
+        <dt><span>Region</span></dt>
+        <dd>
+          <span>{{ person.region }}</span>
+        </dd>
+        <dt><span>Country</span></dt>
+        <dd>
+          <span>{{ person.country }}</span>
+        </dd>
+        <dt><span>User</span></dt>
+        <dd>
+          <span>{{ person.user?.id }}</span>
+        </dd>
+        <dt><span>Manager</span></dt>
+        <dd>
+          <div *ngIf="person.manager">
+            <a [routerLink]="['/person', person.manager.id, 'view']">{{ person.manager.id }}</a>
+          </div>
+        </dd>
+        <dt><span>Team</span></dt>
+        <dd>
+          <span *ngFor="let team of person.teams; let last = last">
+            <a [routerLink]="['/team', team.id, 'view']">{{ team.id }}</a
+            >{{ last ? '' : ', ' }}
+          </span>
+        </dd>
+        <dt><span>Department</span></dt>
+        <dd>
+          <div *ngIf="person.department">
+            <a [routerLink]="['/department', person.department.id, 'view']">{{ person.department.id }}</a>
+          </div>
+        </dd>
+        <dt><span>Role</span></dt>
+        <dd>
+          <div *ngIf="person.role">
+            <a [routerLink]="['/role', person.role.id, 'view']">{{ person.role.id }}</a>
+          </div>
+        </dd>
+      </dl>
+
+      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Back</span>
+      </button>
+
+      <button type="button" [routerLink]="['/person', person.id, 'edit']" class="btn btn-primary">
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span>Edit</span>
+      </button>
+    </div>
+  </div>
+</div>
