@@ -119,3 +119,19 @@
 .status-future {
   color: orange;
 }
+
+my-select {
+  border: 1px solid #007bff;
+  border-radius: 0.25rem;
+  color: #fff;
+  background-color: #007bff;
+  font-size: 1rem;
+  line-height: 1.5;
+  padding: 0.375rem 0.75rem;
+}
+
+.my-select :focus {
+  outline: none;
+  border-color: #4d90fe;
+  box-shadow: 0 0 0 0.2rem rgba(77, 144, 254, 0.25);
+}

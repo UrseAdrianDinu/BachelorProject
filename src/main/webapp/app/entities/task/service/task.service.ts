@@ -9,7 +9,8 @@ import { DATE_FORMAT } from 'app/config/input.constants';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
 import { ITask, NewTask } from '../task.model';
-import { IRisk, NewRisk } from '../../risk/risk.model';
+import { IRisk } from '../../risk/risk.model';
+import { EditTask } from './task-edit.model';
 
 export type PartialUpdateTask = Partial<ITask> & Pick<ITask, 'id'>;
 
@@ -39,6 +40,12 @@ export class TaskService {
 
   createTask(task: NewTask, projectId: number, sprintId: number, personId: number): Observable<EntityResponseType> {
     return this.http.post<IRisk>(`${this.resourceUrl}/project/${projectId}/sprint/${sprintId}/person/${personId}`, task, {
+      observe: 'response',
+    });
+  }
+
+  editTask(task: EditTask, taskId: number, personId: number): Observable<EntityResponseType> {
+    return this.http.put<IRisk>(`${this.resourceUrl}/${taskId}/person/${personId}`, task, {
       observe: 'response',
     });
   }

@@ -10,6 +10,7 @@ import com.licenta.repository.ProjectRepository;
 import com.licenta.repository.SprintRepository;
 import com.licenta.repository.TaskRepository;
 import com.licenta.service.dto.TaskDTO;
+import com.licenta.service.dto.TaskEditDTO;
 import com.licenta.service.mapper.TaskMapper;
 import java.util.LinkedList;
 import java.util.List;
@@ -116,6 +117,30 @@ public class TaskService {
             })
             .map(taskRepository::save)
             .map(taskMapper::toDto);
+    }
+
+    public TaskDTO editTask(TaskEditDTO taskEditDTO, Long taskId, Long personId) {
+        Optional<Task> taskOptional = taskRepository.findById(taskId);
+        Optional<Person> personOptional = personRepository.findById(personId);
+        if (taskOptional.isPresent() && personOptional.isPresent()) {
+            Task task = taskOptional.get();
+            Person person = personOptional.get();
+            task.setTitle(taskEditDTO.getTitle());
+            task.setDescription(taskEditDTO.getDescription());
+            task.setEstimatedTime(taskEditDTO.getEstimatedTime());
+            task.setTimeLogged(taskEditDTO.getTimeLogged());
+            task.setStoryPoints(taskEditDTO.getStoryPoints());
+            task.setPriority(taskEditDTO.getPriority());
+            task.setStatus(taskEditDTO.getStatus());
+            String lastName = person.getUser().getLastName();
+            String firstName = person.getUser().getFirstName();
+            task.setAssignee(lastName + " " + firstName + "(" + person.getCode() + ")");
+            task.setPerson(person);
+            task.setReporter(taskEditDTO.getReporter());
+            task = taskRepository.save(task);
+            return taskMapper.toDto(task);
+        }
+        return null;
     }
 
     /**

@@ -139,20 +139,20 @@
     </div>
   </div>
 
-  <div class="" *ngIf="account != null">
+  <div class="" *ngIf="account !== null">
     <div style="margin-left: 36px; margin-top: 40px">
       <div style="font-size: 24px; font-family: Verdana, sans-serif; text-transform: capitalize">
-        Hello, {{ account?.firstName }}, id {{ account?.id }}!
+        Hello, {{ account.firstName }}, id {{ account.id }}!
       </div>
 
-      <div *ngIf="person?.department == null && !isAdmin && person?.role == null">
+      <div *ngIf="person?.department === null && !isAdmin && person?.role === null">
         <div style="font-size: 24px; font-family: Verdana, sans-serif">You are currently not part of a company.</div>
         <button class="btn btn-primary" (click)="goRegisterPage()">Click here to register your company</button>
       </div>
 
       <div *ngIf="person?.role?.id && !person?.department?.id">It seems you registered your company but not set the departments</div>
-      <div *ngIf="company" style="font-size: 24px; font-family: Verdana, sans-serif">You are currently working for {{ company?.name }}</div>
-      <div *ngIf="company && role" style="font-size: 24px; font-family: Verdana, sans-serif">Your job is {{ role?.name }}</div>
+      <div *ngIf="company" style="font-size: 24px; font-family: Verdana, sans-serif">You are currently working for {{ company.name }}</div>
+      <div *ngIf="company && role" style="font-size: 24px; font-family: Verdana, sans-serif">Your job is {{ role.name }}</div>
     </div>
   </div>
 </ng-container>

@@ -6,12 +6,8 @@ import { isPresent } from 'app/core/util/operators';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
 import { ITeam, NewTeam } from '../team.model';
-import { CreatePhase } from '../../phase/service/create-phase.model';
 import { IPhase } from '../../phase/phase.model';
 import { CreateTeam } from './create-team.model';
-import { IRisk } from '../../risk/risk.model';
-import { IPerson } from '../../person/person.model';
-import { IPersonUser } from '../../person/list-company-people/person-user.model';
 import { IPersonUserRole } from '../../person/list-company-people/person-user-role.model';
 
 export type PartialUpdateTeam = Partial<ITeam> & Pick<ITeam, 'id'>;

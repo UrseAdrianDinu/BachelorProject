@@ -9,9 +9,6 @@ import { DATE_FORMAT } from 'app/config/input.constants';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
 import { ISprint, NewSprint } from '../sprint.model';
-import { IRisk, NewRisk } from '../../risk/risk.model';
-import { ITeam } from '../../team/team.model';
-import { IPhase } from '../../phase/phase.model';
 import { ITask } from '../../task/task.model';
 
 export type PartialUpdateSprint = Partial<ISprint> & Pick<ISprint, 'id'>;

@@ -7,13 +7,10 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { combineLatest, filter, Observable, switchMap, tap, flatMap, defaultIfEmpty, of } from 'rxjs';
 
 import { AccountService } from 'app/core/auth/account.service';
-import { Account } from 'app/core/auth/account.model';
 import { LoginService } from 'app/login/login.service';
 import { AccountExt } from '../core/auth/account-ext.model';
 import { PersonService } from '../entities/person/service/person.service';
-import { IPerson, NewPerson } from '../entities/person/person.model';
-import { HttpResponse } from '@angular/common/http';
-import { ChangeDetectorRef } from '@angular/core';
+import { IPerson } from '../entities/person/person.model';
 import { ICompany } from '../entities/company/company.model';
 import { IRole } from '../entities/role/role.model';
 import { forkJoin } from 'rxjs';
@@ -184,12 +181,9 @@ export class HomeComponent implements OnInit, OnDestroy {
           if (account!.login !== 'admin') {
             return this.personService.getPersonByUser(this.account!.id).pipe(
               flatMap(person => {
-                this.person = person?.body!;
-                console.log(this.person?.id);
-
-                const company$ = this.personService.getPersonCompany(this.person?.id!);
-                const role$ = this.personService.getPersonRole(this.person?.id!);
-                console.log('HOMEOME');
+                this.person = person.body!;
+                const company$ = this.personService.getPersonCompany(this.person.id);
+                const role$ = this.personService.getPersonRole(this.person.id);
                 return forkJoin([of(person), company$, role$]);
               })
             );
@@ -200,19 +194,14 @@ export class HomeComponent implements OnInit, OnDestroy {
           }
         })
       )
-      .subscribe(
-        ([person, company, role]) => {
-          if (person) {
-            this.person = person?.body!;
-            this.company = company?.body!;
-            this.role = role?.body!;
-            this.isInitialized = true;
-          }
-        },
-        error => {
-          //console.error(error);
+      .subscribe(([person, company, role]) => {
+        if (person) {
+          this.person = person.body ?? null;
+          this.company = company?.body ?? null;
+          this.role = role?.body ?? null;
+          this.isInitialized = true;
         }
-      );
+      });
   }
 
   login(): void {

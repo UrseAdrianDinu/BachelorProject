@@ -10,7 +10,6 @@ import { ApplicationConfigService } from 'app/core/config/application-config.ser
 import { createRequestOption } from 'app/core/request/request-util';
 import { IProject, NewProject } from '../project.model';
 import { IDepartment } from '../../department/department.model';
-import { CreateDepartment } from '../../department/create-department/create-department.model';
 import { CreateProject } from '../create-project/create-project.model';
 import { IPhase } from '../../phase/phase.model';
 import { ITeam } from '../../team/team.model';

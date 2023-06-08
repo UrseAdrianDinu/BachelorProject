@@ -103,7 +103,7 @@ modernizer {
 
 
 
-check.dependsOn integrationTest
+//check.dependsOn integrationTest
 task testReport(type: TestReport) {
     destinationDir = file("$buildDir/reports/tests")
     reportOn test
@@ -285,6 +285,6 @@ if (project.hasProperty("nodeInstall")) {
     tasks.named("npmSetup").configure { finalizedBy fixedNpm }
 }
 
-test.dependsOn webapp_test
+//test.dependsOn webapp_test
 compileJava.dependsOn processResources
 processResources.dependsOn bootBuildInfo

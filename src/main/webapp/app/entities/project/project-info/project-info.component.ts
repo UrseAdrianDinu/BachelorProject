@@ -24,6 +24,18 @@ import { PersonService } from '../../person/service/person.service';
 import { IPersonUserRole } from '../../person/list-company-people/person-user-role.model';
 import { ITask, NewTask } from '../../task/task.model';
 import { TaskService } from '../../task/service/task.service';
+import { AccountService } from '../../../core/auth/account.service';
+import { Account } from '../../../core/auth/account.model';
+import { AccountExt } from '../../../core/auth/account-ext.model';
+import { takeUntil } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { defaultIfEmpty } from 'rxjs/operators';
+import { flatMap } from 'rxjs/operators';
+import { ICompany } from '../../company/company.model';
+import { filter } from 'rxjs/operators';
+import dayjs from 'dayjs';
+import { EditTask } from '../../task/service/task-edit.model';
 
 @Component({
   selector: 'jhi-project-info',
@@ -42,6 +54,8 @@ export class ProjectInfoComponent implements OnInit {
   selectedPhase: string | undefined;
   selectedProbability: string = '';
   selectedStatus: string = '';
+  selectedEditTaskStatus: string = '';
+  selectedEditMember: string = '';
   selectedDisplayPhase: IPhase | undefined;
   displayObject: string = 'phase';
   selectedDisplayTeam: ITeam | undefined;
@@ -51,8 +65,28 @@ export class ProjectInfoComponent implements OnInit {
   selectedDisplaySprint: ISprint | undefined;
   sprintTasks: ITask[] = [];
   selectedTaskPriority: string = '';
+  selectedEditTaskPriority: string = '';
+  selectedSprintStatus: string = '';
+  selectedTaskAssignee: string = '';
+  selectedEditTaskAssignee: string = '';
+
   projectPeople: IPersonUser[] = [];
   selectedPersonForTask: string = '';
+  selectedTaskDisplayPriority: string = 'ALL';
+  selectedTaskDislayStatus: string = 'ALL';
+  inprogressTasks: ITask[] = [];
+  toDoTasks: ITask[] = [];
+  codeReviewTasks: ITask[] = [];
+  readyForQaTasks: ITask[] = [];
+  doneTasks: ITask[] = [];
+  displayTasks: ITask[] = [];
+
+  person!: IPerson | null;
+
+  company!: ICompany | null;
+
+  account: AccountExt | null = null;
+  private readonly destroy$ = new Subject<void>();
 
   createFormPhase = new FormGroup({
     name: new FormControl('', {
@@ -129,6 +163,35 @@ export class ProjectInfoComponent implements OnInit {
     reporter: new FormControl(''),
   });
 
+  editFormTask = new FormGroup({
+    title: new FormControl('', {
+      nonNullable: false,
+      validators: [Validators.required],
+    }),
+    description: new FormControl('', {
+      validators: [],
+    }),
+    estimatedTime: new FormControl('', {
+      validators: [Validators.required],
+    }),
+    timeLogged: new FormControl('', {
+      validators: [Validators.required],
+    }),
+    storyPoints: new FormControl('', {
+      validators: [Validators.required],
+    }),
+    priority: new FormControl('', {
+      validators: [Validators.required],
+    }),
+    status: new FormControl('', {
+      validators: [Validators.required],
+    }),
+    assignee: new FormControl('', {
+      validators: [Validators.required],
+    }),
+    reporter: new FormControl(''),
+  });
+
   constructor(
     protected activatedRoute: ActivatedRoute,
     protected projectService: ProjectService,
@@ -138,53 +201,86 @@ export class ProjectInfoComponent implements OnInit {
     protected sprintService: SprintService,
     protected personService: PersonService,
     protected taskService: TaskService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private accountService: AccountService
   ) {}
 
   selectedTab: string = 'sprints';
 
   ngOnInit(): void {
-    this.activatedRoute.data
+    this.accountService
+      .getAuthenticationState()
       .pipe(
-        switchMap(({ project }) => {
-          this.project = project;
-          console.log(this.project?.endDate);
-          console.log(this.project?.name);
-          console.log(this.project?.company);
-
-          return forkJoin([this.projectService.getProjectPhases(this.project!.id), this.projectService.getProjectTeams(this.project!.id)]);
-        }),
-        switchMap(([phases, teams]) => {
-          this.phases = phases.body!;
-          console.log(this.phases);
-          this.activePhase = this.phases.find(phase => phase.status === 'ACTIVE');
-          console.log(this.activePhase);
-          this.teams = teams.body!;
-          console.log(teams.body);
-          this.selectedDisplayPhase = this.activePhase;
-          if (this.activePhase) {
-            return forkJoin([
-              this.phaseService.findPhaseRisks(this.activePhase.id),
-              this.phaseService.findPhaseSprints(this.activePhase.id),
-            ]).pipe(
-              map(([risks, sprints]) => ({
-                risks: risks.body!,
-                sprints: sprints.body!,
-              }))
+        takeUntil(this.destroy$),
+        tap(account => (this.account = account)),
+        defaultIfEmpty(null),
+        filter(account => account !== null),
+        flatMap(account => {
+          if (account!.login !== 'admin') {
+            return this.personService.getPersonByUser(this.account!.id).pipe(
+              flatMap(person => {
+                this.person = person.body!;
+                const company$ = this.personService.getPersonCompany(this.person.id);
+                const role$ = this.personService.getPersonRole(this.person.id);
+                return forkJoin([of(person), company$, role$]);
+              })
             );
           } else {
-            return of({ risks: null, sprints: null });
+            return of([null, null, null]);
           }
         })
       )
-      .subscribe(({ risks, sprints }) => {
-        if (this.activePhase) {
-          this.risks = risks;
-          console.log(this.risks);
-          this.sprints = sprints;
-          console.log(this.sprints);
-        } else {
-          console.log('activePhase is null');
+      .subscribe(([person, company, role]) => {
+        if (person) {
+          this.person = person.body ?? null;
+          this.company = company?.body ?? null;
+
+          this.activatedRoute.data
+            .pipe(
+              switchMap(({ project }) => {
+                this.project = project;
+                console.log(this.project?.endDate);
+                console.log(this.project?.name);
+                console.log(this.project?.company);
+
+                return forkJoin([
+                  this.projectService.getProjectPhases(this.project!.id),
+                  this.projectService.getProjectTeams(this.project!.id),
+                ]);
+              }),
+              switchMap(([phases, teams]) => {
+                this.phases = phases.body!;
+                console.log(this.phases);
+                this.activePhase = this.phases.find(phase => phase.status === 'ACTIVE');
+                console.log(this.activePhase);
+                this.teams = teams.body!;
+                console.log(teams.body);
+                this.selectedDisplayPhase = this.activePhase;
+                if (this.activePhase) {
+                  return forkJoin([
+                    this.phaseService.findPhaseRisks(this.activePhase.id),
+                    this.phaseService.findPhaseSprints(this.activePhase.id),
+                  ]).pipe(
+                    map(([risks, sprints]) => ({
+                      risks: risks.body!,
+                      sprints: sprints.body!,
+                    }))
+                  );
+                } else {
+                  return of({ risks: null, sprints: null });
+                }
+              })
+            )
+            .subscribe(({ risks, sprints }) => {
+              if (this.activePhase) {
+                this.risks = risks;
+                console.log(this.risks);
+                this.sprints = sprints;
+                console.log(this.sprints);
+              } else {
+                console.log('activePhase is null');
+              }
+            });
         }
       });
   }
@@ -224,6 +320,7 @@ export class ProjectInfoComponent implements OnInit {
           if (this.createFormTeam.valid) {
             // Form is valid, do something with the form data
             console.log(this.createFormTeam.value);
+
             this.teamService
               .createTeamProject(this.createFormTeam.getRawValue(), this.project!.id)
               .pipe(switchMap(() => this.projectService.getProjectTeams(this.project!.id)))
@@ -389,9 +486,14 @@ export class ProjectInfoComponent implements OnInit {
   setSelectedSprint(sprint: ISprint) {
     this.selectedDisplaySprint = sprint;
     this.displayObject = 'sprint';
-    console.log(this.selectedDisplaySprint.number);
     this.sprintService.getSprintTasks(this.selectedDisplaySprint.id).subscribe(res => {
       this.sprintTasks = res.body!;
+      this.displayTasks = this.sprintTasks;
+      this.toDoTasks = this.sprintTasks.filter(task => task.status === 'TODO');
+      this.inprogressTasks = this.sprintTasks.filter(task => task.status === 'IN_PROGRESS');
+      this.doneTasks = this.sprintTasks.filter(task => task.status === 'DONE');
+      this.readyForQaTasks = this.sprintTasks.filter(task => task.status === 'READY_FOR_QA');
+      this.codeReviewTasks = this.sprintTasks.filter(task => task.status === 'CODE_REVIEW');
     });
   }
 
@@ -412,6 +514,12 @@ export class ProjectInfoComponent implements OnInit {
                 .pipe(switchMap(() => this.sprintService.getSprintTasks(this.selectedDisplaySprint!.id)))
                 .subscribe(res => {
                   this.sprintTasks = res.body!;
+                  this.displayTasks = this.sprintTasks;
+                  this.toDoTasks = this.sprintTasks.filter(task => task.status === 'TODO');
+                  this.inprogressTasks = this.sprintTasks.filter(task => task.status === 'IN_PROGRESS');
+                  this.doneTasks = this.sprintTasks.filter(task => task.status === 'DONE');
+                  this.readyForQaTasks = this.sprintTasks.filter(task => task.status === 'READY_FOR_QA');
+                  this.codeReviewTasks = this.sprintTasks.filter(task => task.status === 'CODE_REVIEW');
                 });
             }
           }
@@ -430,5 +538,117 @@ export class ProjectInfoComponent implements OnInit {
   selectChangeHandlerPersonTask($event: Event) {
     const target = $event.target as HTMLSelectElement;
     this.selectedPersonForTask = target?.value;
+  }
+
+  selectChangeHandlerTaskDislayStatus($event: Event) {
+    const target = $event.target as HTMLSelectElement;
+    this.selectedTaskDislayStatus = target.value;
+    console.log('CHANGE STATUS');
+    console.log(this.selectedTaskDislayStatus);
+    console.log(this.selectedTaskDisplayPriority);
+    if (this.selectedTaskDislayStatus === 'ALL' && this.selectedTaskDisplayPriority === 'ALL') {
+      this.displayTasks = this.sprintTasks;
+    } else if (this.selectedTaskDislayStatus === 'ALL' && this.selectedTaskDisplayPriority !== 'ALL') {
+      this.displayTasks = this.sprintTasks.filter(task => {
+        return task.priority === this.selectedTaskDisplayPriority;
+      });
+    } else if (this.selectedTaskDislayStatus !== 'ALL' && this.selectedTaskDisplayPriority === 'ALL') {
+      this.displayTasks = this.sprintTasks.filter(task => {
+        return task.status === this.selectedTaskDislayStatus;
+      });
+    } else {
+      this.displayTasks = this.sprintTasks.filter(task => {
+        return task.status === this.selectedTaskDislayStatus && task.priority === this.selectedTaskDisplayPriority;
+      });
+    }
+  }
+
+  selectChangeHandlerTaskDisplayPriority($event: Event) {
+    const target = $event.target as HTMLSelectElement;
+    this.selectedTaskDisplayPriority = target.value;
+    console.log('CHANGE PRIO');
+    console.log(this.selectedTaskDislayStatus);
+    console.log(this.selectedTaskDisplayPriority);
+    if (this.selectedTaskDislayStatus === 'ALL' && this.selectedTaskDisplayPriority === 'ALL') {
+      this.displayTasks = this.sprintTasks;
+    } else if (this.selectedTaskDislayStatus === 'ALL' && this.selectedTaskDisplayPriority !== 'ALL') {
+      this.displayTasks = this.sprintTasks.filter(task => {
+        return task.priority === this.selectedTaskDisplayPriority;
+      });
+    } else if (this.selectedTaskDislayStatus !== 'ALL' && this.selectedTaskDisplayPriority === 'ALL') {
+      console.log(this.selectedTaskDislayStatus);
+      this.displayTasks = this.sprintTasks.filter(task => {
+        return task.status === this.selectedTaskDislayStatus;
+      });
+    } else {
+      this.displayTasks = this.sprintTasks.filter(task => {
+        return task.status === this.selectedTaskDislayStatus && task.priority === this.selectedTaskDisplayPriority;
+      });
+    }
+  }
+
+  editTask(task: ITask, content: any) {
+    this.projectService.getProjectPeopleUser(this.project!.id).subscribe(res => {
+      this.projectPeople = res.body!;
+      console.log(this.projectPeople);
+      this.editFormTask.setValue({
+        title: task.title || '',
+        description: task.description || '',
+        estimatedTime: task.estimatedTime!.toString() || '',
+        timeLogged: task.timeLogged ? task.timeLogged.toString() : '0',
+        storyPoints: task.storyPoints ? task.storyPoints.toString() : '0',
+        priority: task.priority || '',
+        status: task.status || '',
+        assignee: task.assignee || '',
+        reporter: task.reporter || '',
+      });
+      this.selectedEditTaskStatus = task.status!.toString();
+      this.selectedEditMember = task.assignee!.toString();
+      this.selectedEditTaskPriority = task.priority!.toString();
+      console.log(this.selectedTaskAssignee);
+
+      this.modalService.open(content, { ariaLabelledBy: 'modal-title', backdrop: 'static' }).result.then(
+        result => {
+          if (result === 'save') {
+            // Handle form submission
+            if (this.editFormTask.valid) {
+              // Form is valid, do something with the form data
+              console.log(this.editFormTask.value);
+              console.log(task.id);
+              const personId = parseInt(this.editFormTask.get('assignee')!.value!);
+              this.taskService.editTask(this.editFormTask.getRawValue() as EditTask, task.id, personId).subscribe(res => {
+                console.log('Adsadadas');
+                this.sprintService.getSprintTasks(this.selectedDisplaySprint!.id).subscribe(res => {
+                  this.sprintTasks = res.body!;
+                  this.displayTasks = this.sprintTasks;
+                });
+              });
+            }
+          }
+        },
+        reason => {
+          // Modal dismissed
+        }
+      );
+    });
+  }
+
+  selectChangeHandlerEditTaskStatus($event: Event) {
+    const target = $event.target as HTMLSelectElement;
+    this.selectedEditTaskStatus = target.value;
+  }
+
+  selectChangeHandlerEditProbability($event: Event) {
+    const target = $event.target as HTMLSelectElement;
+    this.selectedEditTaskPriority = target.value;
+  }
+
+  selectChangeHandlerEditPersonTask($event: Event) {
+    const target = $event.target as HTMLSelectElement;
+    this.selectedEditTaskAssignee = target.value;
+  }
+
+  selectChangeHandlerSprintStatus($event: Event) {
+    this.selectedSprintStatus = ($event.target as HTMLSelectElement).value;
   }
 }

@@ -174,8 +174,8 @@
     >
       <div style="display: flex; align-items: center; justify-content: space-between">
         <h3 *ngIf="selectedDisplayPhase !== undefined">
-          <span *ngIf="selectedDisplayPhase?.status === PhaseStatus.ACTIVE">{{ selectedDisplayPhase?.name }} is the active phase</span>
-          <span *ngIf="selectedDisplayPhase?.status !== PhaseStatus.ACTIVE">{{ selectedDisplayPhase?.name }}</span>
+          <span *ngIf="selectedDisplayPhase?.status === PhaseStatus.ACTIVE">{{ selectedDisplayPhase.name }} is the active phase</span>
+          <span *ngIf="selectedDisplayPhase?.status !== PhaseStatus.ACTIVE">{{ selectedDisplayPhase.name }}</span>
         </h3>
         <div>
           <div class="button-bar">
@@ -260,7 +260,7 @@
     >
       <div style="display: flex; align-items: center; justify-content: space-between">
         <h3 *ngIf="selectedDisplayTeam !== undefined">
-          <span>Team {{ selectedDisplayTeam?.name }}</span>
+          <span>Team {{ selectedDisplayTeam.name }}</span>
         </h3>
         <div>
           <div style="display: flex">
@@ -314,12 +314,50 @@
     >
       <div style="display: flex; align-items: center; justify-content: space-between">
         <h3 *ngIf="selectedDisplaySprint !== undefined">
-          <span>Sprint {{ selectedDisplaySprint?.number }}</span>
+          <span>Sprint {{ selectedDisplaySprint.number }}</span>
         </h3>
-        <div>
-          <div style="display: flex; flex-direction: column">
-            <button style="margin-bottom: 5px" (click)="addTask(addTaskModal)" class="btn btn-primary row">Add task</button>
-            <button (click)="backToCurrentPhase()" class="btn btn-primary row">Back to current phase</button>
+        <div style="display: flex; align-items: center">
+          <div class="col">
+            <label style="display: block">Tasks Priority:</label>
+            <select
+              [(ngModel)]="selectedTaskDisplayPriority"
+              style="height: 30px; width: 100%"
+              class="my-select"
+              (change)="selectChangeHandlerTaskDisplayPriority($event)"
+            >
+              <option value="ALL">All Tasks</option>
+              <option value="LOWEST">LOWEST</option>
+              <option value="LOW">LOW</option>
+              <option value="MEDIUM">MEDIUM</option>
+              <option value="HIGH">HIGH</option>
+              <option value="HIGHEST">HIGHEST</option>
+            </select>
+          </div>
+          <div class="col" style="margin-left: 5px">
+            <label style="display: block">Tasks status:</label>
+            <select
+              [(ngModel)]="selectedTaskDislayStatus"
+              style="height: 30px; width: 100%"
+              class="my-select"
+              (change)="selectChangeHandlerTaskDislayStatus($event)"
+            >
+              <option value="ALL">All Tasks</option>
+              <option value="TODO">TO DO</option>
+              <option value="IN_PROGRESS">IN PROGRESS</option>
+              <option value="CODE_REVIEW">CODE REVIEW</option>
+              <option value="READY_FOR_QA">READY FOR QA</option>
+              <option value="DONE">DONE</option>
+            </select>
+          </div>
+          <div style="display: flex; margin-left: 10px">
+            <div style="flex: 1">
+              <button style="height: 100%; width: 100%" (click)="addTask(addTaskModal)" class="btn btn-primary">Add task</button>
+            </div>
+            <div style="flex: 1">
+              <button style="height: 100%; width: 100%" (click)="backToCurrentPhase()" class="btn btn-primary">
+                Back to current phase
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -329,48 +367,52 @@
         <ng-container *ngIf="sprintTasks?.length !== 0">
           <h4>Tasks</h4>
           <div class="row">
-            <div *ngFor="let task of sprintTasks" class="col-md-3">
-              <div class="card bg-light border-primary mb-3">
-                <div class="card-body">
-                  <h5 class="card-title">{{ task.title }}</h5>
-                  <label style="font-weight: bold">Assignee:</label>
-                  <div class="card-text">
-                    {{ task.assignee }}
-                  </div>
-                  <label style="font-weight: bold">Description:</label>
-                  <div class="card-text">
-                    {{ task.description }}
-                  </div>
-                  <label style="font-weight: bold">Status:</label>
-                  <div class="card-text">
-                    {{ task.status }}
-                  </div>
-                  <label style="font-weight: bold">Start date:</label>
-                  <div class="card-text">
-                    {{ task.startDate }}
-                  </div>
-                  <label style="font-weight: bold">Estimated time:</label>
-                  <div class="card-text">
-                    {{ task.estimatedTime }}
-                  </div>
-                  <label style="font-weight: bold">Time logged:</label>
-                  <div *ngIf="!task.timeLogged" class="card-text">0 hours</div>
-                  <div *ngIf="task.timeLogged" class="card-text">{{ task.timeLogged }} hours</div>
-                  <label style="font-weight: bold">Story points:</label>
-                  <div class="card-text">
-                    {{ task.storyPoints }}
-                  </div>
-                  <label style="font-weight: bold">Priority:</label>
-                  <div class="card-text">
-                    {{ task.priority }}
-                  </div>
-                  <label style="font-weight: bold">Reporter:</label>
-                  <div class="card-text">
-                    {{ task.reporter }}
+            <ng-container>
+              <div *ngFor="let task of displayTasks" class="col-md-3">
+                <div class="card bg-light border-primary mb-3">
+                  <div class="card-body">
+                    <h5 class="card-title" style="display: flex; justify-content: space-between; align-items: center">
+                      <span>{{ task.title }}</span>
+                      <button class="btn btn-primary" (click)="editTask(task, editTaskModal)">Edit task</button>
+                    </h5>
+                    <label style="font-weight: bold">Assignee:</label>
+                    <div class="card-text">
+                      {{ task.assignee }}
+                    </div>
+                    <label style="font-weight: bold">Description:</label>
+                    <div class="card-text">
+                      {{ task.description }}
+                    </div>
+                    <label style="font-weight: bold">Status:</label>
+                    <div class="card-text">
+                      {{ task.status }}
+                    </div>
+                    <label style="font-weight: bold">Start date:</label>
+                    <div class="card-text">
+                      {{ task.startDate }}
+                    </div>
+                    <label style="font-weight: bold">Estimated time:</label>
+                    <div class="card-text">{{ task.estimatedTime }} hours</div>
+                    <label style="font-weight: bold">Time logged:</label>
+                    <div *ngIf="!task.timeLogged" class="card-text">0 hours</div>
+                    <div *ngIf="task.timeLogged" class="card-text">{{ task.timeLogged }} hours</div>
+                    <label style="font-weight: bold">Story points:</label>
+                    <div class="card-text">
+                      {{ task.storyPoints }}
+                    </div>
+                    <label style="font-weight: bold">Priority:</label>
+                    <div class="card-text">
+                      {{ task.priority }}
+                    </div>
+                    <label style="font-weight: bold">Reporter:</label>
+                    <div *ngIf="task.reporter !== undefined" class="card-text">
+                      {{ task.reporter }}
+                    </div>
+                    <div *ngIf="!task.reporter" class="card-text">Unknown</div>
                   </div>
                 </div>
               </div>
-            </div>
+            </ng-container>
           </div>
         </ng-container>
       </ng-container>
@@ -500,11 +542,11 @@
         <input type="text" class="form-control" id="sprintGoal" formControlName="goal" />
       </div>
       <div class="form-group">
-        <label for="sprintStatus">Probability</label>
+        <label for="sprintStatus">Status</label>
         <select
-          [(ngModel)]="selectedStatus"
+          [(ngModel)]="selectedSprintStatus"
           class="custom-select row"
-          (change)="selectChangeHandlerProbability($event)"
+          (change)="selectChangeHandlerSprintStatus($event)"
           style="width: 300px; height: 40px; margin-left: 1px"
           formControlName="status"
           id="sprintStatus"
@@ -582,16 +624,6 @@
         <label for="taskDescription">Description</label>
         <textarea class="form-control" id="taskDescription" formControlName="description"> </textarea>
       </div>
-      <!--      <div class="form-group">-->
-      <!--        <label for="sprintStatus">Probability</label>-->
-      <!--        <select [(ngModel)]="selectedStatus" class="custom-select row" (change)="selectChangeHandlerProbability($event)"-->
-      <!--                style="width: 300px; height: 40px; margin-left:1px" formControlName="status"-->
-      <!--                id="sprintStatus" name="sprintStatus">-->
-      <!--          <option [value]="" disabled [selected]="selectedStatus === ''">Choose status</option>-->
-      <!--          <option value="ACTIVE">ACTIVE</option>-->
-      <!--          <option value="FUTURE">FUTURE</option>-->
-      <!--        </select>-->
-      <!--      </div>-->
       <div class="form-group">
         <label for="taskStartDate">Start Date</label>
         <input type="date" class="form-control" id="taskStartDate" formControlName="startDate" />
@@ -626,7 +658,7 @@
       <div class="form-group">
         <label class="form-label">Assignee</label>
         <select
-          [(ngModel)]="selectedMember"
+          [(ngModel)]="selectedTaskAssignee"
           class="custom-select row"
           (change)="selectChangeHandlerPersonTask($event)"
           style="width: 300px; height: 40px; margin-left: 1px"
@@ -634,7 +666,7 @@
           id="taskAsignee"
           name="taskAsignee"
         >
-          <option [value]="" disabled [selected]="selectedMember === ''">Select member</option>
+          <option [value]="" disabled [selected]="selectedTaskAssignee === ''">Select member</option>
           <option *ngFor="let person of projectPeople" [value]="person.personDTO.id">
             {{ person.adminUserDTO.firstName }} {{ person.adminUserDTO.lastName }}
           </option>
@@ -650,5 +682,103 @@
   <div class="modal-footer">
     <button type="button" class="btn btn-secondary" (click)="modal.dismiss('cancel')">Cancel</button>
     <button type="button" class="btn btn-primary" (click)="modal.close('save')" [disabled]="!createFormTask.valid">Save</button>
+  </div>
+</ng-template>
+
+<ng-template #editTaskModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-title-edit-tasks">Edit task</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('cancel')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="editFormTask">
+      <div class="form-group">
+        <label for="edittaskTitle">Title</label>
+        <input type="text" class="form-control" id="edittaskTitle" formControlName="title" />
+      </div>
+      <div class="form-group">
+        <label for="edittaskDescription">Description</label>
+        <textarea class="form-control" id="edittaskDescription" formControlName="description"> </textarea>
+      </div>
+      <div class="form-group">
+        <label for="edittaskEstimatedTime">Estimated time(hours)</label>
+        <input type="number" class="form-control" id="edittaskEstimatedTime" formControlName="estimatedTime" />
+      </div>
+      <div class="form-group">
+        <label for="edittaskLoggedhours">Logged hours(hours)</label>
+        <input type="number" class="form-control" id="edittaskLoggedhours" formControlName="timeLogged" />
+      </div>
+      <div class="form-group">
+        <label for="edittaskStoryPoints">Story points</label>
+        <input type="number" class="form-control" id="edittaskStoryPoints" formControlName="storyPoints" />
+      </div>
+      <div class="form-group">
+        <label for="edittaskPrioity">Priority</label>
+        <select
+          [(ngModel)]="selectedEditTaskPriority"
+          class="custom-select row"
+          (change)="selectChangeHandlerEditProbability($event)"
+          style="width: 300px; height: 40px; margin-left: 1px"
+          formControlName="priority"
+          id="edittaskPrioity"
+          name="taskPrioity"
+        >
+          <option [value]="" disabled [selected]="selectedEditTaskPriority === ''">Choose priority</option>
+          <option value="LOWEST">LOWEST</option>
+          <option value="LOW">LOW</option>
+          <option value="MEDIUM">MEDIUM</option>
+          <option value="HIGH">HIGH</option>
+          <option value="HIGHEST">HIGHEST</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="edittaskStatus">Status</label>
+        <select
+          [(ngModel)]="selectedEditTaskStatus"
+          class="custom-select row"
+          (change)="selectChangeHandlerEditTaskStatus($event)"
+          style="width: 300px; height: 40px; margin-left: 1px"
+          formControlName="status"
+          id="edittaskStatus"
+          name="edittaskStatus"
+        >
+          <option [value]="" disabled [selected]="selectedEditTaskStatus === ''">Choose status</option>
+          <option value="TODO">TODO</option>
+          <option value="IN_PROGRESS">IN PROGRESS</option>
+          <option value="CODE_REVIEW">CODE REVIEW</option>
+          <option value="READY_FOR_QA">READY FOR QA</option>
+          <option value="DONE">DONE</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Assignee</label>
+        <select
+          [(ngModel)]="selectedEditTaskAssignee"
+          class="custom-select row"
+          (change)="selectChangeHandlerEditPersonTask($event)"
+          style="width: 300px; height: 40px; margin-left: 1px"
+          formControlName="assignee"
+          id="edittaskAsignee"
+          name="edittaskAsignee"
+        >
+          <option [value]="" disabled [selected]="selectedEditTaskAssignee === ''">Select assignee</option>
+          <option *ngFor="let person of projectPeople" [value]="person.personDTO.id">
+            {{ person.adminUserDTO.firstName }} {{ person.adminUserDTO.lastName }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="edittaskReporter">Reporter</label>
+        <input type="text" class="form-control" id="edittaskReporter" formControlName="reporter" />
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss('cancel')">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="modal.close('save')" [disabled]="!editFormTask.valid">Save</button>
   </div>
 </ng-template>

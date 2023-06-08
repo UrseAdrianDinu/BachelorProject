@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { combineLatest, filter, Observable, switchMap, tap, flatMap, defaultIfEmpty, of } from 'rxjs';
+import { switchMap, tap, of } from 'rxjs';
 import { VERSION } from 'app/app.constants';
-import { Account } from 'app/core/auth/account.model';
 import { AccountService } from 'app/core/auth/account.service';
 import { LoginService } from 'app/login/login.service';
 import { ProfileService } from 'app/layouts/profiles/profile.service';

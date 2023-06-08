@@ -3,6 +3,7 @@ package com.licenta.web.rest;
 import com.licenta.repository.TaskRepository;
 import com.licenta.service.TaskService;
 import com.licenta.service.dto.TaskDTO;
+import com.licenta.service.dto.TaskEditDTO;
 import com.licenta.service.dto.TeamCreateDTO;
 import com.licenta.service.dto.TeamDTO;
 import com.licenta.web.rest.errors.BadRequestAlertException;
@@ -111,6 +112,21 @@ public class TaskResource {
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, taskDTO.getId().toString()))
+            .body(result);
+    }
+
+    @PutMapping("/tasks/{id}/person/{personId}")
+    public ResponseEntity<TaskDTO> editTask(
+        @PathVariable final Long personId,
+        @PathVariable final Long id,
+        @Valid @RequestBody TaskEditDTO taskEditDTO
+    ) throws URISyntaxException {
+        log.debug("REST request to update Task : {}, {}", id, taskEditDTO);
+
+        TaskDTO result = taskService.editTask(taskEditDTO, id, personId);
+        return ResponseEntity
+            .ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
 
