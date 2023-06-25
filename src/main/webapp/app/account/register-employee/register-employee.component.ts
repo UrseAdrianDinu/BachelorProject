@@ -111,7 +111,6 @@ export class RegisterEmployeeComponent implements OnInit, AfterViewInit {
   constructor(private registerService: RegisterService, private route: ActivatedRoute, private companyService: CompanyService) {}
 
   ngOnInit(): void {
-    console.log('dada', this.selectedDepartment);
     this.route.paramMap.subscribe(params => {
       this.companyId = +params.get('id')!;
 
@@ -141,7 +140,6 @@ export class RegisterEmployeeComponent implements OnInit, AfterViewInit {
       const lastName = formValue.lastName;
       const firstName = formValue.firstName;
       const code = lastName!.substring(0, 2).concat(firstName!.substring(0, 2)).toUpperCase();
-      console.log(formValue);
       const parts = this.selectedRole.split(' ');
       let codeRole: string = '';
       for (let i = 0; i < parts.length; i++) {
@@ -206,7 +204,6 @@ export class RegisterEmployeeComponent implements OnInit, AfterViewInit {
   }
 
   previousState() {
-    console.log(this.selectedRole);
     window.history.back();
   }
 }

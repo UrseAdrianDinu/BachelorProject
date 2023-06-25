@@ -139,10 +139,10 @@
     </div>
   </div>
 
-  <div class="" *ngIf="account !== null">
-    <div style="margin-left: 36px; margin-top: 40px">
+  <div class="card jh-card" *ngIf="account !== null" style="background-color: #8ccfda; height: calc(100vh - 61.38px); overflow-y: auto">
+    <div style="margin-left: 20px; margin-top: 20px">
       <div style="font-size: 24px; font-family: Verdana, sans-serif; text-transform: capitalize">
-        Hello, {{ account.firstName }}, id {{ account.id }}!
+        Hello, {{ account.firstName }} {{ account.lastName }} !
       </div>
 
       <div *ngIf="person?.department === null && !isAdmin && person?.role === null">
@@ -153,6 +153,37 @@
       <div *ngIf="person?.role?.id && !person?.department?.id">It seems you registered your company but not set the departments</div>
       <div *ngIf="company" style="font-size: 24px; font-family: Verdana, sans-serif">You are currently working for {{ company.name }}</div>
       <div *ngIf="company && role" style="font-size: 24px; font-family: Verdana, sans-serif">Your job is {{ role.name }}</div>
+
+      <ng-container *ngIf="canViewGraphs">
+        <div style="display: flex; justify-content: center; margin-top: 30px">
+          <div class="col-md-6" style="align-items: center; align-content: center; text-align: center; margin-right: 10px">
+            <label style="margin-right: 150px; font-weight: bold; margin-bottom: 10px">Role Distribution</label>
+            <canvas #roleDistribution></canvas>
+          </div>
+          <div class="col-md-6" style="align-items: center; align-content: center; text-align: center">
+            <label style="margin-right: 150px; font-weight: bold; margin-bottom: 10px">Department distribution</label>
+            <canvas #departmentDistribution></canvas>
+          </div>
+        </div>
+
+        <div class="row" style="align-items: center; align-content: center; text-align: center; margin-top: 100px">
+          <div class="col-md-6" style="margin-left: 0">
+            <label style="margin-right: 150px; font-weight: bold; margin-bottom: 10px">Project Distribution</label>
+            <canvas #projectDistribution></canvas>
+          </div>
+        </div>
+
+        <div style="margin-top: 50px">
+          <div *ngFor="let projectEVA of projectsEVA">
+            <label>{{ projectEVA.projectName }}</label>
+            <uL>
+              <li *ngFor="let phaseEVA of projectEVA.phaseEstimatedVSActualDTOList">
+                {{ phaseEVA.phaseName }} Estimated hours {{ phaseEVA.estimatedHours }} Actual hours {{ phaseEVA.actualHours }}
+              </li>
+            </uL>
+          </div>
+        </div>
+      </ng-container>
     </div>
   </div>
 </ng-container>

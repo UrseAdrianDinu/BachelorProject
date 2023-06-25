@@ -1,122 +1,163 @@
-<div class="d-flex justify-content-left" style="margin-top: 30px; margin-left: 50px">
-  <div class="col-6 md-6" style="flex: 1">
-    <form name="editForm" role="form" novalidate (ngSubmit)="createCompanyAndRole()" [formGroup]="editForm">
-      <h2 id="jhi-company-heading" data-cy="CompanyCreateUpdateHeading">Register your company</h2>
-      <!--     <button (click)="openDialog(myDialog)">Open Dialog</button>-->
+<div style="background-color: #90e0ef; height: calc(100vh - 61.38px)">
+  <ng-container>
+    <div class="card jh-card" style="background-color: #90e0ef">
+      <div class="d-flex justify-content-left" style="margin-top: 5px; margin-left: 50px">
+        <div class="col-6 md-6" style="flex: 1">
+          <form name="editForm" role="form" novalidate (ngSubmit)="createCompanyAndRole()" [formGroup]="editForm">
+            <h2 id="jhi-company-heading" data-cy="CompanyCreateUpdateHeading">Register your company</h2>
+            <div>
+              <jhi-alert-error></jhi-alert-error>
 
-      <!--      <ng-template #myDialog let-modal>-->
-      <!--        <div class="modal-header">-->
-      <!--          <h4 class="modal-title">Popup Dialog</h4>-->
-      <!--          <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">-->
-      <!--            <span aria-hidden="true">&times;</span>-->
-      <!--          </button>-->
-      <!--        </div>-->
-      <!--        <div class="modal-body">-->
-      <!--          &lt;!&ndash; Add your dialog content here &ndash;&gt;-->
-      <!--          <div>-->
-      <!--            <p>Your company has been saved.</p>-->
-      <!--            <p>D?</p>-->
-      <!--            <div class="buttons">-->
-      <!--              <button (click)="selectAnswer(true)">Yes</button>-->
-      <!--              <button (click)="selectAnswer(false)">No</button>-->
-      <!--            </div>-->
-      <!--          </div>-->
-      <!--        </div>-->
-      <!--        <div class="modal-footer">-->
-      <!--          <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Close</button>-->
-      <!--        </div>-->
-      <!--      </ng-template>-->
+              <div class="row-md-3">
+                <label class="form-label" for="field_name">Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="name"
+                  id="field_name"
+                  data-cy="name"
+                  formControlName="name"
+                  style="background-color: #caf0f8"
+                />
+                <div *ngIf="editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)">
+                  <small class="form-text text-danger" style="font-weight: bold" *ngIf="editForm.get('name')?.errors?.required">
+                    This field is required.
+                  </small>
+                </div>
+              </div>
 
-      <div>
-        <jhi-alert-error></jhi-alert-error>
+              <div class="row-md-3">
+                <label class="form-label" for="field_crn">Company registration number</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  style="font-weight: bold"
+                  name="crn"
+                  id="field_crn"
+                  data-cy="crn"
+                  formControlName="crn"
+                  style="background-color: #caf0f8"
+                />
+                <div *ngIf="editForm.get('crn')!.invalid && (editForm.get('crn')!.dirty || editForm.get('crn')!.touched)">
+                  <small class="form-text text-danger" style="font-weight: bold" *ngIf="editForm.get('crn')?.errors?.required">
+                    This field is required.
+                  </small>
+                </div>
+              </div>
 
-        <div class="row mb-3">
-          <label class="form-label" for="field_name">Name</label>
-          <input type="text" class="form-control" name="name" id="field_name" data-cy="name" formControlName="name" />
-          <div *ngIf="editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)">
-            <small class="form-text text-danger" *ngIf="editForm.get('name')?.errors?.required"> This field is required. </small>
-          </div>
+              <div class="row-md-3">
+                <label class="form-label" for="field_description">Description</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="description"
+                  id="field_description"
+                  data-cy="description"
+                  formControlName="description"
+                  style="background-color: #caf0f8"
+                />
+              </div>
+
+              <div class="row-md-3">
+                <label class="form-label" for="field_email">Email</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="email"
+                  id="field_email"
+                  data-cy="email"
+                  formControlName="email"
+                  style="background-color: #caf0f8"
+                />
+              </div>
+
+              <div class="row-md-3">
+                <label class="form-label" for="field_streetAdress">Adress</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="streetAdress"
+                  id="field_streetAdress"
+                  data-cy="streetAdress"
+                  formControlName="streetAdress"
+                  style="background-color: #caf0f8"
+                />
+              </div>
+
+              <div class="row-md-3">
+                <label class="form-label" for="field_city">City</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="city"
+                  id="field_city"
+                  data-cy="city"
+                  formControlName="city"
+                  style="background-color: #caf0f8"
+                />
+              </div>
+
+              <div class="row-md-3">
+                <label class="form-label" for="field_country">Country</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="country"
+                  id="field_country"
+                  data-cy="country"
+                  formControlName="country"
+                  style="background-color: #caf0f8"
+                />
+              </div>
+
+              <div class="row-md-3">
+                <label class="form-label" for="field_ceoName">Chief Executive Officer's Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="ceoName"
+                  id="field_ceoName"
+                  data-cy="ceoName"
+                  formControlName="ceoName"
+                  style="background-color: #caf0f8"
+                />
+              </div>
+            </div>
+
+            <div style="margin-top: 10px">
+              <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+                <fa-icon icon="ban"></fa-icon>&nbsp;<span>Cancel</span>
+              </button>
+
+              <button
+                type="submit"
+                id="save-entity"
+                data-cy="entityCreateSaveButton"
+                [disabled]="editForm.invalid || isSaving"
+                class="btn btn-primary"
+              >
+                <fa-icon icon="save"></fa-icon>&nbsp;<span>Save</span>
+              </button>
+            </div>
+          </form>
         </div>
 
-        <div class="row mb-3">
-          <label class="form-label" for="field_crn">Company registration number</label>
-          <input type="text" class="form-control" name="crn" id="field_crn" data-cy="crn" formControlName="crn" />
-          <div *ngIf="editForm.get('crn')!.invalid && (editForm.get('crn')!.dirty || editForm.get('crn')!.touched)">
-            <small class="form-text text-danger" *ngIf="editForm.get('crn')?.errors?.required"> This field is required. </small>
-          </div>
-        </div>
-
-        <div class="row mb-3">
-          <label class="form-label" for="field_description">Description</label>
-          <input
-            type="text"
-            class="form-control"
-            name="description"
-            id="field_description"
-            data-cy="description"
-            formControlName="description"
-          />
-        </div>
-
-        <div class="row mb-3">
-          <label class="form-label" for="field_email">Email</label>
-          <input type="text" class="form-control" name="email" id="field_email" data-cy="email" formControlName="email" />
-        </div>
-
-        <div class="row mb-3">
-          <label class="form-label" for="field_streetAdress">Adress</label>
-          <input
-            type="text"
-            class="form-control"
-            name="streetAdress"
-            id="field_streetAdress"
-            data-cy="streetAdress"
-            formControlName="streetAdress"
-          />
-        </div>
-
-        <div class="row mb-3">
-          <label class="form-label" for="field_city">City</label>
-          <input type="text" class="form-control" name="city" id="field_city" data-cy="city" formControlName="city" />
-        </div>
-
-        <div class="row mb-3">
-          <label class="form-label" for="field_country">Country</label>
-          <input type="text" class="form-control" name="country" id="field_country" data-cy="country" formControlName="country" />
-        </div>
-
-        <div class="row mb-3">
-          <label class="form-label" for="field_ceoName">Chief Executive Officer's Name</label>
-          <input type="text" class="form-control" name="ceoName" id="field_ceoName" data-cy="ceoName" formControlName="ceoName" />
+        <div class="col-6 md-6" style="margin-left: 100px; margin-top: 55px; flex: 1">
+          <label class="form-label row-md">Your role in the company</label>
+          <select
+            [(ngModel)]="selectedOption"
+            class="custom-select row"
+            (change)="selectChangeHandler($event)"
+            style="width: 500px; background-color: #caf0f8"
+          >
+            <option [value]="" disabled [selected]="selectedOption === ''">Choose role</option>
+            <option value="Chief Executive Officer">Chief Executive Officer</option>
+            <option value="Chief Technical Officer">Chief Technical Officer</option>
+            <option value="Chief Human Resources Officer">Chief Human Resources Officer</option>
+            <option value="Chief Operating Officer">Chief Operating Officer</option>
+          </select>
         </div>
       </div>
-
-      <div>
-        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span>Cancel</span>
-        </button>
-
-        <button
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          [disabled]="editForm.invalid || isSaving"
-          class="btn btn-primary"
-        >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span>Save</span>
-        </button>
-      </div>
-    </form>
-  </div>
-
-  <div class="col-6 md-6" style="margin-left: 100px; margin-top: 55px; flex: 1">
-    <label class="form-label row-md">Your role in the company</label>
-    <select [(ngModel)]="selectedOption" class="custom-select row" (change)="selectChangeHandler($event)" style="width: 500px">
-      <option [value]="" disabled [selected]="selectedOption === ''">Choose role</option>
-      <option value="Chief Executive Officer">Chief Executive Officer</option>
-      <option value="Chief Technical Officer">Chief Technical Officer</option>
-      <option value="Chief Human Resources Officer">Chief Human Resources Officer</option>
-      <option value="Chief Operating Officer">Chief Operating Officer</option>
-    </select>
-  </div>
+    </div>
+  </ng-container>
 </div>

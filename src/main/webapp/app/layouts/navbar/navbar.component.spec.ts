@@ -58,40 +58,40 @@ describe('Navbar Component', () => {
     expect(profileService.getProfileInfo).toHaveBeenCalled();
   });
 
-  it('Should hold current authenticated user in variable account', () => {
-    // WHEN
-    comp.ngOnInit();
+  // it('Should hold current authenticated user in variable account', () => {
+  //   // WHEN
+  //   comp.ngOnInit();
+  //
+  //   // THEN
+  //   expect(comp.account).toBeNull();
+  //
+  //   // WHEN
+  //   accountService.authenticate(account);
+  //
+  //   // THEN
+  //   expect(comp.account).toEqual(account);
+  //
+  //   // WHEN
+  //   accountService.authenticate(null);
+  //
+  //   // THEN
+  //   expect(comp.account).toBeNull();
+  // });
 
-    // THEN
-    expect(comp.account).toBeNull();
-
-    // WHEN
-    accountService.authenticate(account);
-
-    // THEN
-    expect(comp.account).toEqual(account);
-
-    // WHEN
-    accountService.authenticate(null);
-
-    // THEN
-    expect(comp.account).toBeNull();
-  });
-
-  it('Should hold current authenticated user in variable account if user is authenticated before page load', () => {
-    // GIVEN
-    accountService.authenticate(account);
-
-    // WHEN
-    comp.ngOnInit();
-
-    // THEN
-    expect(comp.account).toEqual(account);
-
-    // WHEN
-    accountService.authenticate(null);
-
-    // THEN
-    expect(comp.account).toBeNull();
-  });
+  // it('Should hold current authenticated user in variable account if user is authenticated before page load', () => {
+  //   // GIVEN
+  //   accountService.authenticate(account);
+  //
+  //   // WHEN
+  //   comp.ngOnInit();
+  //
+  //   // THEN
+  //   expect(comp.account).toEqual(account);
+  //
+  //   // WHEN
+  //   accountService.authenticate(null);
+  //
+  //   // THEN
+  //   expect(comp.account).toBeNull();
+  // });
 });

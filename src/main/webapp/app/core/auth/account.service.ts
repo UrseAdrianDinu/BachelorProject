@@ -69,7 +69,7 @@ export class AccountService {
     if (!this.accountCache$ || force) {
       this.accountCache$ = this.fetch().pipe(
         tap((account: AccountExt) => {
-          let curr: Account = new Account(
+          const curr: Account = new Account(
             account.activated,
             account.authorities,
             account.email,

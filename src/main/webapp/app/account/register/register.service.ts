@@ -15,7 +15,7 @@ export class RegisterService {
   }
 
   saveEmployee(registrationEmployee: RegistrationEmployee, companyId: number): Observable<{}> {
-    let url = this.applicationConfigService.getEndpointFor('api/register-employee') + `/${companyId}`;
+    const url = this.applicationConfigService.getEndpointFor('api/register-employee') + `/${companyId}`;
     return this.http.post(url, registrationEmployee);
   }
 }

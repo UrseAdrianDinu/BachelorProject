@@ -69,12 +69,6 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
-            <th scope="col" jhiSortBy="company.id">
-              <div class="d-flex">
-                <span>Company</span>
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
             <th scope="col"></th>
           </tr>
         </thead>
@@ -96,11 +90,7 @@
               <div *ngIf="department.parentDept">
                 <a [routerLink]="['/department', department.parentDept.id, 'view']">{{ department.parentDept.id }}</a>
               </div>
-            </td>
-            <td>
-              <div *ngIf="department.company">
-                <a [routerLink]="['/company', department.company.id, 'view']">{{ department.company.id }}</a>
-              </div>
+              <div *ngIf="department.parentDept === null">None</div>
             </td>
             <td class="text-end">
               <div class="btn-group">

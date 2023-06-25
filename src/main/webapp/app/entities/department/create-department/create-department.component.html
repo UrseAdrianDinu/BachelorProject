@@ -1,72 +1,116 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    <form name="createForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="createForm">
-      <h2 id="jhi-department-heading" data-cy="DepartmentCreateUpdateHeading">Create a new department</h2>
+<div style="background-color: #90e0ef; height: calc(100vh - 61.38px)">
+  <ng-container>
+    <div class="card jh-card" style="background-color: #90e0ef">
+      <div class="d-flex" style="margin-left: 30px; margin-top: 20px">
+        <div class="col-8">
+          <form name="createForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="createForm">
+            <h2 id="jhi-department-heading" data-cy="DepartmentCreateUpdateHeading">Create a new department</h2>
 
-      <div>
-        <jhi-alert-error></jhi-alert-error>
+            <div>
+              <jhi-alert-error></jhi-alert-error>
 
-        <div class="row mb-3">
-          <label class="form-label" for="field_name">Name</label>
-          <input type="text" class="form-control" name="name" id="field_name" data-cy="name" formControlName="name" />
-          <div *ngIf="createForm.get('name')!.invalid && (createForm.get('name')!.dirty || createForm.get('name')!.touched)">
-            <small class="form-text text-danger" *ngIf="createForm.get('name')?.errors?.required"> This field is required. </small>
-          </div>
-        </div>
+              <div class="row-md-3">
+                <label class="form-label" for="field_name">Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="name"
+                  id="field_name"
+                  data-cy="name"
+                  formControlName="name"
+                  style="background-color: #caf0f8"
+                />
+                <div *ngIf="createForm.get('name')!.invalid && (createForm.get('name')!.dirty || createForm.get('name')!.touched)">
+                  <small class="form-text text-danger" style="font-weight: bold" *ngIf="createForm.get('name')?.errors?.required">
+                    This field is required.
+                  </small>
+                </div>
+              </div>
 
-        <div class="row mb-3">
-          <label class="form-label" for="field_code">Code</label>
-          <input type="text" class="form-control" name="code" id="field_code" data-cy="code" formControlName="code" />
-          <div *ngIf="createForm.get('code')!.invalid && (createForm.get('code')!.dirty || createForm.get('code')!.touched)">
-            <small class="form-text text-danger" *ngIf="createForm.get('code')?.errors?.required"> This field is required. </small>
-          </div>
-        </div>
+              <div class="row-md-3" style="margin-top: 5px">
+                <label class="form-label" for="field_code">Code</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="code"
+                  id="field_code"
+                  data-cy="code"
+                  formControlName="code"
+                  style="background-color: #caf0f8"
+                />
+                <div *ngIf="createForm.get('code')!.invalid && (createForm.get('code')!.dirty || createForm.get('code')!.touched)">
+                  <small class="form-text text-danger" style="font-weight: bold" *ngIf="createForm.get('code')?.errors?.required">
+                    This field is required.
+                  </small>
+                </div>
+              </div>
 
-        <div class="row mb-3">
-          <label class="form-label" for="field_email">Email</label>
-          <input type="text" class="form-control" name="email" id="field_email" data-cy="email" formControlName="email" />
-          <div *ngIf="createForm.get('email')!.invalid && (createForm.get('email')!.dirty || createForm.get('email')!.touched)">
-            <small class="form-text text-danger" *ngIf="createForm.get('email')?.errors?.required"> This field is required. </small>
-          </div>
-        </div>
+              <div class="row-md-3" style="margin-top: 5px">
+                <label class="form-label" for="field_email">Email</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="email"
+                  id="field_email"
+                  data-cy="email"
+                  formControlName="email"
+                  style="background-color: #caf0f8"
+                />
+                <div *ngIf="createForm.get('email')!.invalid && (createForm.get('email')!.dirty || createForm.get('email')!.touched)">
+                  <small class="form-text text-danger" style="font-weight: bold" *ngIf="createForm.get('email')?.errors?.required">
+                    This field is required.
+                  </small>
+                </div>
+              </div>
 
-        <div class="row mb-3">
-          <label class="form-label" for="field_description">Description</label>
-          <input
-            type="text"
-            class="form-control"
-            name="description"
-            id="field_description"
-            data-cy="description"
-            formControlName="description"
-          />
-        </div>
+              <div class="row-md-3" style="margin-top: 5px">
+                <label class="form-label" for="field_description">Description</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="description"
+                  id="field_description"
+                  data-cy="description"
+                  formControlName="description"
+                  style="background-color: #caf0f8"
+                />
+              </div>
 
-        <div class="row mb-3">
-          <label class="form-label" for="field_parentDept">Parent Department</label>
-          <select class="form-control" id="field_parentDept" data-cy="parentDept" name="parentDept" formControlName="parentDept">
-            <option [ngValue]="departmentName" *ngFor="let departmentName of departmentNames">
-              {{ departmentName }}
-            </option>
-          </select>
+              <div class="row-md-3" style="margin-top: 5px">
+                <label class="form-label" for="field_parentDept">Parent Department</label>
+                <select
+                  class="form-control"
+                  id="field_parentDept"
+                  data-cy="parentDept"
+                  name="parentDept"
+                  formControlName="parentDept"
+                  style="background-color: #caf0f8"
+                >
+                  <option [ngValue]="departmentName" *ngFor="let departmentName of departmentNames">
+                    {{ departmentName }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <div style="margin-top: 10px">
+              <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+                <fa-icon icon="ban"></fa-icon>&nbsp;<span>Cancel</span>
+              </button>
+
+              <button
+                type="submit"
+                id="save-entity"
+                data-cy="entityCreateSaveButton"
+                [disabled]="createForm.invalid || isSaving"
+                class="btn btn-primary"
+              >
+                <fa-icon icon="save"></fa-icon>&nbsp;<span>Save</span>
+              </button>
+            </div>
+          </form>
         </div>
       </div>
-
-      <div>
-        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span>Cancel</span>
-        </button>
-
-        <button
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          [disabled]="createForm.invalid || isSaving"
-          class="btn btn-primary"
-        >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span>Save</span>
-        </button>
-      </div>
-    </form>
-  </div>
+    </div>
+  </ng-container>
 </div>

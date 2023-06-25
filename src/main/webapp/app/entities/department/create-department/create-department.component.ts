@@ -61,9 +61,6 @@ export class CreateDepartmentComponent implements OnInit {
 
       this.companyService.getDepartmentNames(this.companyId!).subscribe(res => {
         this.departmentNames = res.body!;
-        for (let i = 0; i < this.departmentNames.length; i++) {
-          console.log(this.departmentNames[i]);
-        }
       });
     });
   }

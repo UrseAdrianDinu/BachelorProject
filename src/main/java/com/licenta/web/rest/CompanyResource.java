@@ -202,6 +202,30 @@ public class CompanyResource {
         return companyService.findCompanyPersonUsers(id);
     }
 
+    @GetMapping("/companies/role-distribution/{id}")
+    public List<RoleCountDTO> getRoleDistribution(@PathVariable Long id) {
+        log.debug("REST request to get Role distribution: {}", id);
+        return companyService.getRoleDistribution(id);
+    }
+
+    @GetMapping("/companies/department-distribution/{id}")
+    public List<DepartmentCountDTO> getDepartmentDistribution(@PathVariable Long id) {
+        log.debug("REST request to get Department distribution: {}", id);
+        return companyService.getDepartmentDistribution(id);
+    }
+
+    @GetMapping("/companies/project-distribution/{id}")
+    public List<ProjectCountDTO> getProjectDistribution(@PathVariable Long id) {
+        log.debug("REST request to get Department distribution: {}", id);
+        return companyService.getProjectDistribution(id);
+    }
+
+    @GetMapping("/companies/projects-estimated-vs-actual/{id}")
+    public List<ProjectEstimatedVSActualDTO> getProjectEstimatedVsActual(@PathVariable Long id) {
+        log.debug("REST request to get Department distribution: {}", id);
+        return companyService.getProjectEstimatedVSActual(id);
+    }
+
     /**
      * {@code DELETE  /companies/:id} : delete the "id" company.
      *

@@ -135,3 +135,23 @@ my-select {
   border-color: #4d90fe;
   box-shadow: 0 0 0 0.2rem rgba(77, 144, 254, 0.25);
 }
+
+.highest-priority {
+  color: #7c0404;
+}
+
+.high-priority {
+  color: red;
+}
+
+.medium-priority {
+  color: orange;
+}
+
+.low-priority {
+  color: #009400;
+}
+
+.lowest-priority {
+  color: #59ff59;
+}

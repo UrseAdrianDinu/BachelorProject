@@ -36,6 +36,7 @@ import { ICompany } from '../../company/company.model';
 import { filter } from 'rxjs/operators';
 import dayjs from 'dayjs';
 import { EditTask } from '../../task/service/task-edit.model';
+import { IRole } from '../../role/role.model';
 
 @Component({
   selector: 'jhi-project-info',
@@ -57,7 +58,7 @@ export class ProjectInfoComponent implements OnInit {
   selectedEditTaskStatus: string = '';
   selectedEditMember: string = '';
   selectedDisplayPhase: IPhase | undefined;
-  displayObject: string = 'phase';
+  displayObject: string = '';
   selectedDisplayTeam: ITeam | undefined;
   teamPeople: IPersonUserRole[] = [];
   selectedMember: string = '';
@@ -82,7 +83,7 @@ export class ProjectInfoComponent implements OnInit {
   displayTasks: ITask[] = [];
 
   person!: IPerson | null;
-
+  role!: IRole | null;
   company!: ICompany | null;
 
   account: AccountExt | null = null;
@@ -233,16 +234,13 @@ export class ProjectInfoComponent implements OnInit {
       .subscribe(([person, company, role]) => {
         if (person) {
           this.person = person.body ?? null;
+          this.role = role?.body ?? null;
           this.company = company?.body ?? null;
 
           this.activatedRoute.data
             .pipe(
               switchMap(({ project }) => {
                 this.project = project;
-                console.log(this.project?.endDate);
-                console.log(this.project?.name);
-                console.log(this.project?.company);
-
                 return forkJoin([
                   this.projectService.getProjectPhases(this.project!.id),
                   this.projectService.getProjectTeams(this.project!.id),
@@ -250,11 +248,8 @@ export class ProjectInfoComponent implements OnInit {
               }),
               switchMap(([phases, teams]) => {
                 this.phases = phases.body!;
-                console.log(this.phases);
                 this.activePhase = this.phases.find(phase => phase.status === 'ACTIVE');
-                console.log(this.activePhase);
                 this.teams = teams.body!;
-                console.log(teams.body);
                 this.selectedDisplayPhase = this.activePhase;
                 if (this.activePhase) {
                   return forkJoin([
@@ -274,11 +269,9 @@ export class ProjectInfoComponent implements OnInit {
             .subscribe(({ risks, sprints }) => {
               if (this.activePhase) {
                 this.risks = risks;
-                console.log(this.risks);
                 this.sprints = sprints;
-                console.log(this.sprints);
               } else {
-                console.log('activePhase is null');
+                // console.log('activePhase is null');
               }
             });
         }
@@ -296,7 +289,6 @@ export class ProjectInfoComponent implements OnInit {
           // Handle form submission
           if (this.createFormPhase.valid) {
             // Form is valid, do something with the form data
-            console.log(this.createFormPhase.value);
             this.phaseService
               .createPhaseProject(this.createFormPhase.getRawValue(), this.project!.id)
               .pipe(switchMap(() => this.projectService.getProjectPhases(this.project!.id)))
@@ -319,7 +311,6 @@ export class ProjectInfoComponent implements OnInit {
           // Handle form submission
           if (this.createFormTeam.valid) {
             // Form is valid, do something with the form data
-            console.log(this.createFormTeam.value);
 
             this.teamService
               .createTeamProject(this.createFormTeam.getRawValue(), this.project!.id)
@@ -339,13 +330,11 @@ export class ProjectInfoComponent implements OnInit {
   selectChangeHandlerPhase($event: Event) {
     const target = $event.target as HTMLSelectElement;
     this.selectedPhase = target?.value;
-    console.log(this.selectedPhase);
   }
 
   setActivePhase() {
     this.phaseService.setPhaseActive(parseInt(this.selectedPhase!, 10)).subscribe(res => {
       this.activePhase = res.body!;
-      console.log(this.activePhase);
     });
   }
 
@@ -356,7 +345,6 @@ export class ProjectInfoComponent implements OnInit {
           // Handle form submission
           if (this.createFormRisk.valid) {
             // Form is valid, do something with the form data
-            console.log(this.createFormRisk.value);
             this.riskService
               .createRiskPhase(this.createFormRisk.getRawValue() as NewRisk, this.selectedDisplayPhase!.id)
               .pipe(switchMap(() => this.phaseService.findPhaseRisks(this.selectedDisplayPhase!.id)))
@@ -379,7 +367,6 @@ export class ProjectInfoComponent implements OnInit {
           // Handle form submission
           if (this.createFormSprint.valid) {
             // Form is valid, do something with the form data
-            console.log(this.createFormSprint.value);
             this.sprintService
               .createSprintPhase(this.createFormSprint.getRawValue() as NewSprint, this.selectedDisplayPhase!.id)
               .pipe(switchMap(() => this.phaseService.findPhaseSprints(this.selectedDisplayPhase!.id)))
@@ -398,7 +385,6 @@ export class ProjectInfoComponent implements OnInit {
   selectChangeHandlerProbability($event: Event) {
     const target = $event.target as HTMLSelectElement;
     this.selectedProbability = target?.value;
-    console.log(this.selectedProbability);
   }
 
   getProbabilityClass(probability: string | null | undefined): string {
@@ -408,6 +394,22 @@ export class ProjectInfoComponent implements OnInit {
       return 'medium-probability';
     } else if (probability === 'LOW') {
       return 'low-probability';
+    } else {
+      return '';
+    }
+  }
+
+  getPriorityClass(probability: string | null | undefined): string {
+    if (probability === 'HIGH') {
+      return 'high-priority';
+    } else if (probability === 'MEDIUM') {
+      return 'medium-priority';
+    } else if (probability === 'LOW') {
+      return 'low-probability';
+    } else if (probability === 'LOWEST') {
+      return 'low-probability';
+    } else if (probability === 'HIGHEST') {
+      return 'highest-priority';
     } else {
       return '';
     }
@@ -446,21 +448,18 @@ export class ProjectInfoComponent implements OnInit {
     this.selectedDisplayTeam = team;
     this.teamService.findTeamPeople(team.id).subscribe(res => {
       this.teamPeople = res.body!;
-      console.log(this.teamPeople);
     });
   }
 
   addMember(content: any) {
     this.personService.queryPeopleUserByCompany(this.project!.company!.id).subscribe(res => {
       this.companyPeople = res.body!;
-      console.log(this.companyPeople);
       this.modalService.open(content, { ariaLabelledBy: 'modal-title', backdrop: 'static' }).result.then(
         result => {
           if (result === 'save') {
             // Handle form submission
             if (this.addFormMember.valid) {
               // Form is valid, do something with the form data
-              console.log(this.addFormMember.value);
               const personId = parseInt(this.addFormMember.get('member')!.value!);
               this.personService
                 .addPersonTeam(personId, this.selectedDisplayTeam?.id!)
@@ -500,14 +499,12 @@ export class ProjectInfoComponent implements OnInit {
   addTask(content: any) {
     this.projectService.getProjectPeopleUser(this.project!.id).subscribe(res => {
       this.projectPeople = res.body!;
-      console.log(this.projectPeople);
       this.modalService.open(content, { ariaLabelledBy: 'modal-title', backdrop: 'static' }).result.then(
         result => {
           if (result === 'save') {
             // Handle form submission
             if (this.createFormTask.valid) {
               // Form is valid, do something with the form data
-              console.log(this.createFormTask.value);
               const personId = parseInt(this.createFormTask.get('assignee')!.value!);
               this.taskService
                 .createTask(this.createFormTask.getRawValue() as NewTask, this.project!.id, this.selectedDisplaySprint!.id, personId)
@@ -543,9 +540,6 @@ export class ProjectInfoComponent implements OnInit {
   selectChangeHandlerTaskDislayStatus($event: Event) {
     const target = $event.target as HTMLSelectElement;
     this.selectedTaskDislayStatus = target.value;
-    console.log('CHANGE STATUS');
-    console.log(this.selectedTaskDislayStatus);
-    console.log(this.selectedTaskDisplayPriority);
     if (this.selectedTaskDislayStatus === 'ALL' && this.selectedTaskDisplayPriority === 'ALL') {
       this.displayTasks = this.sprintTasks;
     } else if (this.selectedTaskDislayStatus === 'ALL' && this.selectedTaskDisplayPriority !== 'ALL') {
@@ -566,9 +560,6 @@ export class ProjectInfoComponent implements OnInit {
   selectChangeHandlerTaskDisplayPriority($event: Event) {
     const target = $event.target as HTMLSelectElement;
     this.selectedTaskDisplayPriority = target.value;
-    console.log('CHANGE PRIO');
-    console.log(this.selectedTaskDislayStatus);
-    console.log(this.selectedTaskDisplayPriority);
     if (this.selectedTaskDislayStatus === 'ALL' && this.selectedTaskDisplayPriority === 'ALL') {
       this.displayTasks = this.sprintTasks;
     } else if (this.selectedTaskDislayStatus === 'ALL' && this.selectedTaskDisplayPriority !== 'ALL') {
@@ -576,7 +567,6 @@ export class ProjectInfoComponent implements OnInit {
         return task.priority === this.selectedTaskDisplayPriority;
       });
     } else if (this.selectedTaskDislayStatus !== 'ALL' && this.selectedTaskDisplayPriority === 'ALL') {
-      console.log(this.selectedTaskDislayStatus);
       this.displayTasks = this.sprintTasks.filter(task => {
         return task.status === this.selectedTaskDislayStatus;
       });
@@ -590,7 +580,6 @@ export class ProjectInfoComponent implements OnInit {
   editTask(task: ITask, content: any) {
     this.projectService.getProjectPeopleUser(this.project!.id).subscribe(res => {
       this.projectPeople = res.body!;
-      console.log(this.projectPeople);
       this.editFormTask.setValue({
         title: task.title || '',
         description: task.description || '',
@@ -605,7 +594,6 @@ export class ProjectInfoComponent implements OnInit {
       this.selectedEditTaskStatus = task.status!.toString();
       this.selectedEditMember = task.assignee!.toString();
       this.selectedEditTaskPriority = task.priority!.toString();
-      console.log(this.selectedTaskAssignee);
 
       this.modalService.open(content, { ariaLabelledBy: 'modal-title', backdrop: 'static' }).result.then(
         result => {
@@ -613,11 +601,8 @@ export class ProjectInfoComponent implements OnInit {
             // Handle form submission
             if (this.editFormTask.valid) {
               // Form is valid, do something with the form data
-              console.log(this.editFormTask.value);
-              console.log(task.id);
               const personId = parseInt(this.editFormTask.get('assignee')!.value!);
               this.taskService.editTask(this.editFormTask.getRawValue() as EditTask, task.id, personId).subscribe(res => {
-                console.log('Adsadadas');
                 this.sprintService.getSprintTasks(this.selectedDisplaySprint!.id).subscribe(res => {
                   this.sprintTasks = res.body!;
                   this.displayTasks = this.sprintTasks;

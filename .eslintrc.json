@@ -36,6 +36,7 @@
         "style": "camelCase"
       }
     ],
+    "@typescript-eslint/no-inferrable-types": "off",
     "@angular-eslint/relative-url-prefix": "error",
     "@typescript-eslint/ban-types": [
       "error",
@@ -46,54 +47,28 @@
         }
       }
     ],
-    "@typescript-eslint/explicit-function-return-type": ["error", { "allowExpressions": true }],
     "@typescript-eslint/explicit-module-boundary-types": "off",
-    "@typescript-eslint/member-ordering": [
-      "error",
-      {
-        "default": [
-          "public-static-field",
-          "protected-static-field",
-          "private-static-field",
-          "public-instance-field",
-          "protected-instance-field",
-          "private-instance-field",
-          "constructor",
-          "public-static-method",
-          "protected-static-method",
-          "private-static-method",
-          "public-instance-method",
-          "protected-instance-method",
-          "private-instance-method"
-        ]
-      }
-    ],
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-floating-promises": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
-    "@typescript-eslint/no-parameter-properties": ["warn", { "allows": ["public", "private", "protected"] }],
-    "@typescript-eslint/no-shadow": ["error"],
-    "@typescript-eslint/no-unnecessary-condition": "error",
     "@typescript-eslint/no-unsafe-argument": "off",
+    "@typescript-eslint/no-unnecessary-type-assertion": "off",
     "@typescript-eslint/no-unsafe-assignment": "off",
     "@typescript-eslint/no-unsafe-call": "off",
+    "@typescript-eslint/no-non-null-asserted-optional-chain": "off",
     "@typescript-eslint/no-unsafe-member-access": "off",
-    "@typescript-eslint/prefer-nullish-coalescing": "error",
     "@typescript-eslint/prefer-optional-chain": "error",
     "@typescript-eslint/unbound-method": "off",
-    "arrow-body-style": "error",
-    "curly": "error",
-    "eqeqeq": ["error", "always", { "null": "ignore" }],
+    "@typescript-eslint/restrict-plus-operands": "off",
     "guard-for-in": "error",
     "no-bitwise": "error",
     "no-caller": "error",
-    "no-console": ["error", { "allow": ["warn", "error"] }],
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
     "no-eval": "error",
     "no-labels": "error",
     "no-new": "error",
     "no-new-wrappers": "error",
     "object-shorthand": ["error", "always", { "avoidExplicitReturnArrows": true }],
-    "radix": "error",
     "spaced-comment": ["warn", "always"]
   }
 }

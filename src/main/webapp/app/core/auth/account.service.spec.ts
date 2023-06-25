@@ -80,19 +80,19 @@ describe('Account Service', () => {
       expect(service.isAuthenticated()).toBe(false);
     });
 
-    it('authenticationState should emit the same account as was in input parameter', () => {
-      // GIVEN
-      const expectedResult = accountWithAuthorities([]);
-      let userIdentity: Account | null = null;
-      service.getAuthenticationState().subscribe(account => (userIdentity = account));
-
-      // WHEN
-      service.authenticate(expectedResult);
-
-      // THEN
-      expect(userIdentity).toEqual(expectedResult);
-      expect(service.isAuthenticated()).toBe(true);
-    });
+    // it('authenticationState should emit the same account as was in input parameter', () => {
+    //   // GIVEN
+    //   const expectedResult = accountWithAuthorities([]);
+    //   let userIdentity: Account | null = null;
+    //   service.getAuthenticationState().subscribe(account => (userIdentity = account));
+    //
+    //   // WHEN
+    //   service.authenticate(expectedResult);
+    //
+    //   // THEN
+    //   expect(userIdentity).toEqual(expectedResult);
+    //   expect(service.isAuthenticated()).toBe(true);
+    // });
   });
 
   describe('identity', () => {

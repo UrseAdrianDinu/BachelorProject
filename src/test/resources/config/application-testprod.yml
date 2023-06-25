@@ -11,10 +11,12 @@
 spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: dinu
+    password: 000000
     hikari:
       poolName: Hikari
       auto-commit: false
-      maximum-pool-size: 1
   jpa:
     database-platform: tech.jhipster.domain.util.FixedPostgreSQL10Dialect
     open-in-view: false

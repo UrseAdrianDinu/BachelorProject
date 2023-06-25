@@ -14,6 +14,14 @@
 # ===================================================================
 
 spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: dinu
+    password: 000000
+    hikari:
+      poolName: Hikari
+      auto-commit: false
   application:
     name: licenta
   # Replace by 'prod, faker' to add the faker context and have sample data loaded in production

@@ -7,6 +7,10 @@ import { ApplicationConfigService } from 'app/core/config/application-config.ser
 import { createRequestOption } from 'app/core/request/request-util';
 import { ICompany, NewCompany } from '../company.model';
 import { NewRole } from '../../role/role.model';
+import { RoleCount } from './role-count.model';
+import { DepartmentCount } from './department-count.model';
+import { ProjectCount } from './project-count.model';
+import { ProjectEVA } from './projectEVA.model';
 
 export type PartialUpdateCompany = Partial<ICompany> & Pick<ICompany, 'id'>;
 
@@ -61,6 +65,26 @@ export class CompanyService {
 
   getCompanyIdentifier(company: Pick<ICompany, 'id'>): number {
     return company.id;
+  }
+
+  getRoleDistribution(id: number): Observable<HttpResponse<RoleCount[]>> {
+    const url = this.resourceUrl + `/role-distribution/${id}`;
+    return this.http.get<RoleCount[]>(url, { observe: 'response' });
+  }
+
+  getDepartmentDistribution(id: number): Observable<HttpResponse<DepartmentCount[]>> {
+    const url = this.resourceUrl + `/department-distribution/${id}`;
+    return this.http.get<DepartmentCount[]>(url, { observe: 'response' });
+  }
+
+  getProjectDistribution(id: number): Observable<HttpResponse<ProjectCount[]>> {
+    const url = this.resourceUrl + `/project-distribution/${id}`;
+    return this.http.get<ProjectCount[]>(url, { observe: 'response' });
+  }
+
+  getProjectsEva(id: number): Observable<HttpResponse<ProjectEVA[]>> {
+    const url = this.resourceUrl + `/projects-estimated-vs-actual//${id}`;
+    return this.http.get<ProjectEVA[]>(url, { observe: 'response' });
   }
 
   compareCompany(o1: Pick<ICompany, 'id'> | null, o2: Pick<ICompany, 'id'> | null): boolean {

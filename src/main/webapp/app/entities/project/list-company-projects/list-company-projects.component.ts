@@ -71,10 +71,8 @@ export class ListCompanyProjectsComponent implements OnInit {
         person => {
           // Handle the result of the second API call
           this.person = person?.body!;
-          console.log(this.person?.id);
           this.personService.getPersonCompany(this.person?.id!).subscribe(company => {
             this.company = company?.body!;
-            console.log(this.company?.id);
             this.load();
           });
         },

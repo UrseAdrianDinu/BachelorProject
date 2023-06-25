@@ -47,8 +47,6 @@ export class ListCompanyPeopleComponent implements OnInit {
   trackId = (_index: number, item: IPersonUser): number => item.personDTO.id!;
 
   ngOnInit(): void {
-    console.log('ngOnInit');
-    console.log(this.isLoading);
     this.accountService
       .getAuthenticationState()
       .pipe(
@@ -73,10 +71,8 @@ export class ListCompanyPeopleComponent implements OnInit {
         person => {
           // Handle the result of the second API call
           this.person = person?.body!;
-          console.log(this.person?.id);
           this.personService.getPersonCompany(this.person?.id!).subscribe(company => {
             this.company = company?.body!;
-            console.log(this.company?.id);
             this.loadPeopleUser();
           });
         },
@@ -130,7 +126,6 @@ export class ListCompanyPeopleComponent implements OnInit {
   loadPeopleUser(): void {
     this.loadFromBackendWithRouteInformationsPeopleUser().subscribe({
       next: (res: HttpResponse<IPersonUser[]>) => {
-        console.log(this.isLoading);
         this.onResponseSuccessPeopleUser(res);
       },
     });
@@ -168,7 +163,6 @@ export class ListCompanyPeopleComponent implements OnInit {
   protected onResponseSuccessPeopleUser(response: HttpResponse<IPersonUser[]>): void {
     const dataFromBody = this.fillComponentAttributesFromResponseBodyPersonUser(response.body);
     this.peopleUser = this.refineDataPeopleUser(dataFromBody);
-    console.log(this.peopleUser);
   }
 
   protected refineData(data: IPerson[]): IPerson[] {
@@ -197,10 +191,8 @@ export class ListCompanyPeopleComponent implements OnInit {
     ];
 
     if (personFields.includes(this.predicate)) {
-      console.log('person');
       return data.sort(this.sortService.startSortPeopleUser(this.predicate, 'person', this.ascending ? 1 : -1));
     } else {
-      console.log('user');
       return data.sort(this.sortService.startSortPeopleUser(this.predicate, 'user', this.ascending ? 1 : -1));
     }
   }

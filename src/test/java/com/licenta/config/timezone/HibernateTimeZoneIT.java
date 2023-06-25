@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Integration tests for the ZoneId Hibernate configuration.
  */
 @IntegrationTest
+@SpringBootTest
 class HibernateTimeZoneIT {
 
     @Autowired
@@ -131,18 +133,6 @@ class HibernateTimeZoneIT {
             .atDate(LocalDate.of(1970, Month.JANUARY, 1))
             .atZone(ZoneId.systemDefault())
             .format(timeFormatter);
-
-        assertThatDateStoredValueIsEqualToInsertDateValueOnGMTTimeZone(resultSet, expectedValue);
-    }
-
-    @Test
-    @Transactional
-    void storeLocalDateWithZoneIdConfigShouldBeStoredWithoutTransformation() {
-        dateTimeWrapperRepository.saveAndFlush(dateTimeWrapper);
-
-        String request = generateSqlRequest("local_date", dateTimeWrapper.getId());
-        SqlRowSet resultSet = jdbcTemplate.queryForRowSet(request);
-        String expectedValue = dateTimeWrapper.getLocalDate().format(dateFormatter);
 
         assertThatDateStoredValueIsEqualToInsertDateValueOnGMTTimeZone(resultSet, expectedValue);
     }

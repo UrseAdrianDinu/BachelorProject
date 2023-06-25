@@ -71,6 +71,7 @@ public class PhaseService {
         phase.setObjective(phaseCreateDTO.getObjective());
         phase.setDescription(phaseCreateDTO.getDescription());
         phase.setStartDate(phaseCreateDTO.getStartDate());
+        phase.setEstimatedTime(phaseCreateDTO.getEstimatedTime());
         phase.setStatus(PhaseStatus.CLOSED);
 
         Optional<Project> optionalProject = projectRepository.findById(id);

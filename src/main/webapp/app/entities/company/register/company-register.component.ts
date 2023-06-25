@@ -72,7 +72,6 @@ export class CompanyRegisterComponent implements OnInit, OnDestroy {
   }
 
   save() {
-    console.log(this.selectedOption);
     this.isSaving = true;
     const company = this.companyFormService.getCompany(this.editForm);
     if (company.id !== null) {
@@ -90,7 +89,6 @@ export class CompanyRegisterComponent implements OnInit, OnDestroy {
   }
 
   previousState(): void {
-    //console.log(this.selectedOption);
     // window.history.back();
     this.router.navigate(['']);
   }
@@ -104,7 +102,6 @@ export class CompanyRegisterComponent implements OnInit, OnDestroy {
 
   protected onSaveSuccessCompany(): void {
     // this.previousState();
-    console.log('SAVE COMPANY');
     const parts = this.selectedOption.split(' ');
     const codeRole = parts[0].charAt(0).toUpperCase() + parts[1].charAt(0).toUpperCase() + parts[2].charAt(0).toUpperCase();
     const nr: NewRole = { id: null, name: this.selectedOption, code: codeRole, seniority: RoleSeniority.SENIOR };
@@ -112,8 +109,6 @@ export class CompanyRegisterComponent implements OnInit, OnDestroy {
   }
 
   protected subscribeToSaveResponseRole(result: Observable<HttpResponse<IRole>>): void {
-    console.log('SAVE ROLE');
-
     result.pipe(finalize(() => this.onSaveFinalize())).subscribe({
       next: () => this.onSaveSuccessRole(),
       error: () => this.onSaveError(),
@@ -149,10 +144,8 @@ export class CompanyRegisterComponent implements OnInit, OnDestroy {
   selectAnswer(answer: boolean) {
     if (answer) {
       // Yes button clicked
-      console.log('Yes');
     } else {
       // No button clicked
-      console.log('No');
       this.previousState();
     }
     this.modalService.dismissAll();

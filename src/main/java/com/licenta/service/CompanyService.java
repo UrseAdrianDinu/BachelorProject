@@ -1,9 +1,6 @@
 package com.licenta.service;
 
-import com.licenta.domain.Company;
-import com.licenta.domain.Department;
-import com.licenta.domain.Person;
-import com.licenta.domain.Role;
+import com.licenta.domain.*;
 import com.licenta.domain.enumeration.RoleSeniority;
 import com.licenta.repository.CompanyRepository;
 import com.licenta.repository.DepartmentRepository;
@@ -11,10 +8,7 @@ import com.licenta.repository.PersonRepository;
 import com.licenta.repository.RoleRepository;
 import com.licenta.service.dto.*;
 import com.licenta.service.mapper.*;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -193,6 +187,125 @@ public class CompanyService {
             }
         }
         return persons.stream().map(personMapper::toDto).collect(Collectors.toList());
+    }
+
+    public List<RoleCountDTO> getRoleDistribution(Long id) {
+        log.debug("Request to get role distribution");
+        Optional<Company> companyOptional = companyRepository.findById(id);
+        List<Person> people = new LinkedList<>();
+        if (companyOptional.isPresent()) {
+            people = new LinkedList<>();
+            Company company = companyOptional.get();
+            Set<Department> departments = company.getDepartments();
+            for (Department department : departments) {
+                people.addAll(department.getPeople());
+            }
+        }
+        Map<String, Long> roleCount = new HashMap<>();
+        for (Person person : people) {
+            String role = person.getRole().getName();
+            if (roleCount.containsKey(role)) {
+                roleCount.put(role, roleCount.get(role) + 1);
+            } else {
+                roleCount.put(role, 1L);
+            }
+        }
+
+        List<RoleCountDTO> roleCountDTOs = new ArrayList<>();
+        for (Map.Entry<String, Long> entry : roleCount.entrySet()) {
+            RoleCountDTO roleCountDTO = new RoleCountDTO();
+            roleCountDTO.setRoleName(entry.getKey());
+            roleCountDTO.setCount(entry.getValue());
+            roleCountDTOs.add(roleCountDTO);
+        }
+        return roleCountDTOs;
+    }
+
+    public List<ProjectCountDTO> getProjectDistribution(Long id) {
+        log.debug("Request to get project distribution");
+        Optional<Company> companyOptional = companyRepository.findById(id);
+        Set<Project> projects = new HashSet<>();
+        List<ProjectCountDTO> projectCountDTOS = new ArrayList<>();
+        if (companyOptional.isPresent()) {
+            Company company = companyOptional.get();
+            projects = company.getProjects();
+
+            for (Project project : projects) {
+                int count = 0;
+                Set<Team> teams = project.getTeams();
+                for (Team team : teams) {
+                    count += team.getPeople().size();
+                }
+
+                projectCountDTOS.add(new ProjectCountDTO(project.getName(), (long) count));
+            }
+            return projectCountDTOS;
+        }
+        return null;
+    }
+
+    public List<ProjectEstimatedVSActualDTO> getProjectEstimatedVSActual(Long id) {
+        log.debug("Request to get project estimated vs actual");
+        Optional<Company> companyOptional = companyRepository.findById(id);
+        Set<Project> projects = new HashSet<>();
+        List<ProjectEstimatedVSActualDTO> projectEstimatedVSActualDTOS = new ArrayList<>();
+        if (companyOptional.isPresent()) {
+            Company company = companyOptional.get();
+            projects = company.getProjects();
+
+            for (Project project : projects) {
+                Set<Phase> phases = project.getPhases();
+                List<PhaseEstimatedVSActualDTO> phaseEstimatedVSActualDTOS = new ArrayList<>();
+                for (Phase phase : phases) {
+                    Float estimated = 0f;
+                    Float actual = 0f;
+                    Set<Sprint> sprints = phase.getSprints();
+                    for (Sprint sprint : sprints) {
+                        Set<Task> tasks = sprint.getTasks();
+                        for (Task task : tasks) {
+                            estimated += task.getEstimatedTime();
+                            actual += task.getTimeLogged();
+                        }
+                    }
+                    phaseEstimatedVSActualDTOS.add(new PhaseEstimatedVSActualDTO(phase.getName(), estimated, actual));
+                }
+                projectEstimatedVSActualDTOS.add(new ProjectEstimatedVSActualDTO(project.getName(), phaseEstimatedVSActualDTOS));
+            }
+            return projectEstimatedVSActualDTOS;
+        }
+        return null;
+    }
+
+    public List<DepartmentCountDTO> getDepartmentDistribution(Long id) {
+        log.debug("Request to get department distribution");
+        Optional<Company> companyOptional = companyRepository.findById(id);
+        List<Person> people = new LinkedList<>();
+        if (companyOptional.isPresent()) {
+            people = new LinkedList<>();
+            Company company = companyOptional.get();
+            Set<Department> departments = company.getDepartments();
+            for (Department department : departments) {
+                people.addAll(department.getPeople());
+            }
+        }
+        Map<String, Long> departmentCount = new HashMap<>();
+        for (Person person : people) {
+            String department = person.getDepartment().getName();
+            if (departmentCount.containsKey(department)) {
+                departmentCount.put(department, departmentCount.get(department) + 1);
+            } else {
+                departmentCount.put(department, 1L);
+            }
+        }
+
+        List<DepartmentCountDTO> departmentCountDTOS = new ArrayList<>();
+        for (Map.Entry<String, Long> entry : departmentCount.entrySet()) {
+            DepartmentCountDTO departmentCountDTO = new DepartmentCountDTO();
+            departmentCountDTO.setDepartmentName(entry.getKey());
+            departmentCountDTO.setCount(entry.getValue());
+            departmentCountDTOS.add(departmentCountDTO);
+        }
+        return departmentCountDTOS;
     }
 
     public List<PersonUserDTO> findCompanyPersonUsers(Long id) {

@@ -47,9 +47,9 @@ public class TestContainersSpringContextCustomizerFactory implements ContextCust
                             throw new RuntimeException(e);
                         }
                     }
-                    testValues = testValues.and("spring.datasource.url=" + devTestContainer.getTestContainer().getJdbcUrl() + "");
-                    testValues = testValues.and("spring.datasource.username=" + devTestContainer.getTestContainer().getUsername());
-                    testValues = testValues.and("spring.datasource.password=" + devTestContainer.getTestContainer().getPassword());
+                    testValues = testValues.and("spring.datasource.url=jdbc:postgresql://localhost:5432/postgres");
+                    testValues = testValues.and("spring.datasource.username=dinu");
+                    testValues = testValues.and("spring.datasource.password=000000");
                 }
                 if (
                     Arrays

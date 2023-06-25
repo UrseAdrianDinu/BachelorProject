@@ -60,11 +60,9 @@
             </div>
 
             <div><strong>Billable:</strong> {{ project!.billable }}</div>
-            <div *ngIf="project!.teams?.length === 0">No teams created for this project yet.</div>
-
             <div *ngIf="activePhase === undefined">
               <div class="column">
-                <div class="row" style="margin-top: 20px">
+                <div class="row" style="margin-top: 5px">
                   <div>
                     No active phase
                     <div *ngIf="phases.length === 0">Define the project phases, then set an active one.</div>
@@ -99,66 +97,6 @@
       </div>
     </div>
 
-    <!--    <div class="row-8" style="margin-top: 20px; margin-left: 30px; margin-right: 15px; border: 1px solid #ddd;border-radius: 6px; background-color: #8ccfda; padding: 20px;">-->
-    <!--      <div style="display: flex; align-items: center; justify-content: space-between;">-->
-    <!--        <h3 *ngIf="activePhase !== undefined">-->
-    <!--          <span>{{ activePhase?.name }} is the active phase</span>-->
-    <!--        </h3>-->
-    <!--        <div>-->
-    <!--          <button (click)="addRisk(addRiskModal)" class="btn btn-primary">Add Risk</button>-->
-    <!--          <button (click)="addSprint(addSprintModal)" class="btn btn-primary">Add Sprint</button>-->
-    <!--        </div>-->
-    <!--      </div>-->
-
-    <!--      <div *ngIf="risks === null || risks?.length === 0" style="position: relative;">-->
-    <!--        No risks defined for this phase yet.-->
-    <!--      </div>-->
-
-    <!--      <ng-container *ngIf="risks?.length !== 0">-->
-    <!--        <h4>Risks</h4>-->
-    <!--        <div class="row">-->
-    <!--          <div *ngFor="let risk of risks" class="col-md-3">-->
-    <!--            <div class="card bg-light border-primary mb-3">-->
-    <!--              <div class="card-body">-->
-    <!--                <label style="font-weight: bold">Description:</label>-->
-    <!--                <div class="card-text">{{ risk.description }}</div>-->
-    <!--                <label style="font-weight: bold">Probability:</label>-->
-    <!--                <div class="card-text" [ngClass]="getProbabilityClass(risk.probability)">-->
-    <!--                  {{ risk.probability }}-->
-    <!--                </div>-->
-    <!--                <label style="font-weight: bold">Impact:</label>-->
-    <!--                <div class="card-text">{{ risk.impact }}</div>-->
-    <!--              </div>-->
-    <!--            </div>-->
-    <!--          </div>-->
-    <!--        </div>-->
-    <!--      </ng-container>-->
-
-    <!--      <div *ngIf="sprints === null || sprints?.length === 0" style="position: relative;">-->
-    <!--        No sprints defined for this phase yet.-->
-    <!--      </div>-->
-
-    <!--      <ng-container *ngIf="sprints?.length !== 0">-->
-    <!--        <h4>Sprints</h4>-->
-    <!--        <div class="row">-->
-    <!--          <div *ngFor="let sprint of sprints" class="col-md-3">-->
-    <!--            <div class="card bg-light border-primary mb-3">-->
-    <!--              <div class="card-body">-->
-    <!--                <label style="font-weight: bold">Description:</label>-->
-    <!--                <div class="card-text">{{ sprint.number }}</div>-->
-    <!--                <label style="font-weight: bold">Probability:</label>-->
-    <!--                <div class="card-text">-->
-    <!--                  {{ sprint.goal }}-->
-    <!--                </div>-->
-    <!--                <label style="font-weight: bold">Impact:</label>-->
-    <!--                <div class="card-text">{{ sprint.status }}</div>-->
-    <!--              </div>-->
-    <!--            </div>-->
-    <!--          </div>-->
-    <!--        </div>-->
-    <!--      </ng-container>-->
-    <!--    </div>-->
-
     <div
       *ngIf="displayObject == 'phase'"
       class="row-8"
@@ -173,10 +111,35 @@
       "
     >
       <div style="display: flex; align-items: center; justify-content: space-between">
-        <h3 *ngIf="selectedDisplayPhase !== undefined">
-          <span *ngIf="selectedDisplayPhase?.status === PhaseStatus.ACTIVE">{{ selectedDisplayPhase.name }} is the active phase</span>
-          <span *ngIf="selectedDisplayPhase?.status !== PhaseStatus.ACTIVE">{{ selectedDisplayPhase.name }}</span>
-        </h3>
+        <div>
+          <div *ngIf="selectedDisplayPhase !== undefined">
+            <h3>
+              <span *ngIf="selectedDisplayPhase?.status === PhaseStatus.ACTIVE">{{ selectedDisplayPhase.name }} is the active phase</span>
+              <span *ngIf="selectedDisplayPhase?.status !== PhaseStatus.ACTIVE">{{ selectedDisplayPhase.name }}</span>
+            </h3>
+            <div>
+              <label>Objective:</label>
+              <span>{{ selectedDisplayPhase?.objective }}</span>
+            </div>
+            <div>
+              <label>Description:</label>
+              <span>{{ selectedDisplayPhase?.description }}</span>
+            </div>
+            <div>
+              <label>Start date:</label>
+              <span>{{ selectedDisplayPhase?.startDate }}</span>
+            </div>
+            <div>
+              <label>Estimated time:</label>
+              <span>{{ selectedDisplayPhase?.estimatedTime }} weeks</span>
+            </div>
+            <div>
+              <label>Status:</label>
+              <span>{{ selectedDisplayPhase?.status }}</span>
+            </div>
+          </div>
+          <button class="btn btn-primary">Edit phase details</button>
+        </div>
         <div>
           <div class="button-bar">
             <div [class.active]="selectedTab === 'sprints'" class="col" (click)="selectTab('sprints')">Sprints</div>
@@ -401,7 +364,7 @@
                       {{ task.storyPoints }}
                     </div>
                     <label style="font-weight: bold">Priority:</label>
-                    <div class="card-text">
+                    <div class="card-text" [ngClass]="getPriorityClass(task.priority)">
                       {{ task.priority }}
                     </div>
                     <label style="font-weight: bold">Reporter:</label>
@@ -416,6 +379,24 @@
           </div>
         </ng-container>
       </ng-container>
+    </div>
+
+    <div
+      *ngIf="displayObject == ''"
+      class="row-8"
+      style="
+        margin-top: 20px;
+        margin-left: 30px;
+        margin-right: 15px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background-color: #8ccfda;
+        padding: 20px;
+        font-size: 20px;
+        font-weight: bold;
+      "
+    >
+      Nothing to display
     </div>
   </div>
 </div>
@@ -446,7 +427,7 @@
         <input type="date" class="form-control" id="phaseStartDate" formControlName="startDate" />
       </div>
       <div class="form-group">
-        <label for="phaseEstimatedTime">Estimated Time</label>
+        <label for="phaseEstimatedTime">Estimated Time(weeks)</label>
         <input type="text" class="form-control" id="phaseEstimatedTime" formControlName="estimatedTime" />
       </div>
     </form>
@@ -637,7 +618,7 @@
         <input type="number" class="form-control" id="taskStoryPoints" formControlName="storyPoints" />
       </div>
       <div class="form-group">
-        <label for="taskPrioity">End Date</label>
+        <label for="taskPrioity">Priority</label>
         <select
           [(ngModel)]="selectedTaskPriority"
           class="custom-select row"
